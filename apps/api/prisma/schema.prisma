@@ -1,0 +1,273 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [postgis, vector, uuid_ossp(map: "uuid-ossp"), pg_stat_statements, pgcrypto, supabase_vault]
+}
+
+model User {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email             String?  @unique @db.VarChar(255)
+  phone             String?  @unique @db.VarChar(32)
+  auth_provider     String   @db.VarChar(32)
+  provider_user_id  String?  @db.VarChar(255)
+  full_name         String?  @db.VarChar(255)
+  profile_image_url String?  @db.Text
+  created_at        DateTime @default(now()) @db.Timestamptz()
+  updated_at        DateTime @default(now()) @updatedAt @db.Timestamptz()
+
+  vehicles       UserVehicle[]
+  reviews        UserReview[]
+  favorites      Favorite[]
+  leads          Lead[]
+  search_queries SearchQuery[]
+
+  @@map("users")
+}
+
+model UserVehicle {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String   @db.Uuid
+  make       String   @db.VarChar(64)
+  model      String   @db.VarChar(64)
+  year       Int      @db.Integer
+  trim       String?  @db.VarChar(64)
+  mileage_km Int?     @db.Integer
+  created_at DateTime @default(now()) @db.Timestamptz()
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([make, model])
+  @@map("user_vehicles")
+}
+
+model Garage {
+  id                 String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  external_source_id String?                      @db.VarChar(255)
+  source_provider    String                       @db.VarChar(64)
+  name               String                       @db.VarChar(255)
+  slug               String                       @unique @db.VarChar(255)
+  phone              String?                      @db.VarChar(32)
+  whatsapp           String?                      @db.VarChar(32)
+  website_url        String?                      @db.Text
+  primary_category   String?                      @db.VarChar(128)
+  profile_embedding  Unsupported("vector(1536)")?
+  is_verified        Boolean                      @default(false)
+  is_featured        Boolean                      @default(false)
+  is_active          Boolean                      @default(true)
+  created_at         DateTime                     @default(now()) @db.Timestamptz()
+  updated_at         DateTime                     @default(now()) @updatedAt @db.Timestamptz()
+
+  location              GarageLocation?
+  scores                GarageScore?
+  garage_reviews        GarageReview[]
+  user_reviews          UserReview[]
+  tags                  GarageTag[]
+  services              GarageService[]
+  brand_specializations GarageBrandSpecialization[]
+  favorites             Favorite[]
+  leads                 Lead[]
+  admin_overrides       AdminOverride[]
+
+  @@index([slug])
+  @@index([external_source_id])
+  @@index([is_verified, is_featured])
+  @@map("garages")
+}
+
+model GarageLocation {
+  id           String                                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id    String                                @unique @db.Uuid
+  address_line String?                               @db.Text
+  area         String?                               @db.VarChar(128)
+  city         String                                @db.VarChar(64)
+  emirate      String                                @db.VarChar(64)
+  country      String                                @db.VarChar(64)
+  latitude     Decimal                               @db.Decimal(9, 6)
+  longitude    Decimal                               @db.Decimal(9, 6)
+  geo_point    Unsupported("geography(Point, 4326)")
+  created_at   DateTime                              @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([area])
+  @@index([emirate])
+  @@map("garage_locations")
+}
+
+model GarageReview {
+  id               String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id        String                       @db.Uuid
+  source_provider  String                       @db.VarChar(64)
+  source_review_id String                       @db.VarChar(255)
+  author_name      String?                      @db.VarChar(255)
+  rating           Decimal                      @db.Decimal(2, 1)
+  review_text      String?                      @db.Text
+  review_date      DateTime?                    @db.Timestamptz()
+  raw_payload      Json?                        @db.JsonB
+  review_embedding Unsupported("vector(1536)")?
+  created_at       DateTime                     @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@unique([source_provider, source_review_id])
+  @@index([garage_id])
+  @@index([rating])
+  @@index([review_date])
+  @@map("garage_reviews")
+}
+
+model UserReview {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id           String   @db.Uuid
+  garage_id         String   @db.Uuid
+  rating            Decimal  @db.Decimal(2, 1)
+  review_text       String?  @db.Text
+  service_type      String?  @db.VarChar(64)
+  vehicle_make      String?  @db.VarChar(64)
+  vehicle_model     String?  @db.VarChar(64)
+  is_verified_visit Boolean  @default(false)
+  moderation_status String   @db.VarChar(32)
+  created_at        DateTime @default(now()) @db.Timestamptz()
+
+  user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([garage_id])
+  @@index([user_id])
+  @@index([moderation_status])
+  @@map("user_reviews")
+}
+
+model GarageTag {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id        String   @db.Uuid
+  tag_type         String   @db.VarChar(64)
+  tag_value        String   @db.VarChar(128)
+  confidence_score Decimal? @db.Decimal(4, 3)
+  source_type      String   @db.VarChar(32)
+  model_version    String?  @db.VarChar(64)
+  created_at       DateTime @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([garage_id])
+  @@index([tag_type, tag_value])
+  @@index([confidence_score])
+  @@map("garage_tags")
+}
+
+model GarageScore {
+  id                      String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id               String   @unique @db.Uuid
+  trust_score             Decimal? @db.Decimal(4, 2)
+  speed_score             Decimal? @db.Decimal(4, 2)
+  price_score             Decimal? @db.Decimal(4, 2)
+  luxury_score            Decimal? @db.Decimal(4, 2)
+  budget_score            Decimal? @db.Decimal(4, 2)
+  review_confidence_score Decimal? @db.Decimal(4, 2)
+  overall_score           Decimal? @db.Decimal(4, 2)
+  profile_completeness    String   @db.VarChar(32)
+  last_calculated_at      DateTime @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([overall_score])
+  @@map("garage_scores")
+}
+
+model GarageService {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id        String   @db.Uuid
+  service_category String   @db.VarChar(64)
+  is_verified      Boolean  @default(false)
+  price_band       String?  @db.VarChar(32)
+  created_at       DateTime @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@unique([garage_id, service_category])
+  @@index([service_category])
+  @@map("garage_services")
+}
+
+model GarageBrandSpecialization {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id        String   @db.Uuid
+  brand_name       String   @db.VarChar(64)
+  confidence_score Decimal? @db.Decimal(4, 3)
+  source_type      String   @db.VarChar(32)
+  created_at       DateTime @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@unique([garage_id, brand_name])
+  @@index([brand_name])
+  @@map("garage_brand_specializations")
+}
+
+model Favorite {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String   @db.Uuid
+  garage_id  String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  user   User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, garage_id])
+  @@map("favorites")
+}
+
+model Lead {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String?  @db.Uuid
+  garage_id  String   @db.Uuid
+  lead_type  String   @db.VarChar(32)
+  session_id String?  @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamptz()
+
+  user   User?  @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([garage_id])
+  @@index([user_id])
+  @@index([lead_type])
+  @@map("leads")
+}
+
+model SearchQuery {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String?  @db.Uuid
+  session_id      String?  @db.VarChar(255)
+  raw_query       String   @db.Text
+  resolved_intent Json?    @db.JsonB
+  result_count    Int      @db.Integer
+  latency_ms      Int      @db.Integer
+  created_at      DateTime @default(now()) @db.Timestamptz()
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([session_id])
+  @@map("search_queries")
+}
+
+model AdminOverride {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  garage_id      String   @db.Uuid
+  override_type  String   @db.VarChar(64)
+  override_value Json     @db.JsonB
+  admin_user_id  String   @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz()
+
+  garage Garage @relation(fields: [garage_id], references: [id], onDelete: Cascade)
+
+  @@index([garage_id])
+  @@map("admin_overrides")
+}

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GarageIQ | AI-powered garage discovery</title>
+    <meta name="description" content="AI-powered garage discovery for UAE car owners. Stop guessing between 4.5 stars. Start knowing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="brutalist-cursor"></div>
+    <div id="scroll-progress"></div>
+
+    <!-- Section 1: The Hero (Sticky Projector Pin) -->
+    <section id="hero" class="section viewport-height grid-container bg-black sticky-hero">
+        <div class="grid-line left-line"></div>
+        <div class="grid-line right-line"></div>
+        <div class="botanical-accent botanical-1">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 100 C 50 50, 0 50, 0 0 C 30 10, 50 30, 50 50 C 50 30, 70 10, 100 0 C 100 50, 50 50, 50 100"/>
+            </svg>
+        </div>
+        <div class="content fade-in-content text-center flex-col-center z-10">
+            <h1 class="headline-heavy mechanical-reveal"><span>Find the right garage,</span><br><span>not just a nearby one.</span></h1>
+            <div class="live-data-strip mt-4 mechanical-reveal">
+                <span><span class="pulse-dot inline-block"></span> Tracking <span id="garage-count">0</span> garages &middot; Analyzing <span id="review-count">0</span> reviews</span>
+            </div>
+            <p class="subheadline-light mt-4 mechanical-reveal"><span>AI-powered garage discovery for UAE car owners.</span><br><span>Stop guessing between 4.5 stars. Start knowing.</span></p>
+            <div class="cta-group mt-8 mechanical-reveal">
+                <span><a href="#search" class="btn-primary pill-btn magnetic-btn interactive-cta">Start Searching</a></span>
+                <span><a href="#how-it-works" class="btn-secondary link-hover interactive-text">How it works</a></span>
+            </div>
+        </div>
+        <div class="hero-visual window-wipe-reveal mt-12 z-10">
+            <div class="mockup-search interactive-cta">
+                <div class="search-input"><span id="typewriter-text"></span><span class="cli-cursor"></span></div>
+                <div class="search-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The physical scrolling body that slides over the sticky hero -->
+    <div class="scrolling-overlay">
+
+        <!-- Section 2: The Problem -->
+        <section id="problem" class="section grid-container bg-white solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">01</div>
+            <div class="content split-layout">
+                <div class="text-block">
+                    <h2 class="headline-heavy mechanical-reveal"><span>Star ratings don't tell</span><br><span>the whole story.</span></h2>
+                    <p class="body-light mt-4 mechanical-reveal"><span>You own a car in the UAE. Your brakes are squeaking. You open Google Maps and get 40 pins, all with 4.5+ stars. None of them tell you if they overcharge, if they know German cars, or how fast they actually turn jobs around.</span></p>
+                </div>
+                <div class="visual-block map-visual">
+                    <div class="phone-mockup window-wipe-reveal">
+                        <div class="phone-screen">
+                            <div class="app-header">GarageIQ</div>
+                            <div class="app-card interactive-cta">
+                                <div class="app-card-title">Apex Auto Repair</div>
+                                <div class="ordered-progress">
+                                    <div class="ordered-label">Trust Score: 87/100</div>
+                                    <div class="ordered-track"><div class="ordered-fill"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: The Solution -->
+        <section id="solution" class="section grid-container bg-white solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">02</div>
+            <div class="botanical-accent botanical-2">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 100 C 50 50, 0 50, 0 0 C 30 10, 50 30, 50 50 C 50 30, 70 10, 100 0 C 100 50, 50 50, 50 100"/>
+                </svg>
+            </div>
+            <div class="content split-layout reverse">
+                <div class="text-block">
+                    <h2 class="headline-heavy mechanical-reveal"><span>We turn reviews</span><br><span>into intelligence.</span></h2>
+                    <p class="body-light mt-4 mechanical-reveal"><span>We took 55,000+ fragmented Google reviews and turned them into structured garage intelligence: Trust scores, price bands, and brand specializations. The decision-ready signal that '4.6 stars' never gave you.</span></p>
+                </div>
+                <div class="visual-block cards-visual">
+                    <div class="chaos-to-order-container">
+                        <div class="chaos-stars">
+                            <!-- 15 stars -->
+                            <svg class="star star-1" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-2" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-3" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-4" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-5" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-6" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-7" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-8" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-9" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-10" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-11" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-12" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-13" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-14" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            <svg class="star star-15" viewBox="0 0 24 24" fill="#0A0A0A"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        </div>
+                        <div class="ordered-progress-large">
+                            <div class="ordered-label">Trust Score: 87/100</div>
+                            <div class="ordered-track"><div class="ordered-fill-large"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Why GarageIQ? (Comparison) -->
+        <section id="comparison" class="section grid-container bg-white solid-bg pt-0">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="content">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>Why GarageIQ?</span></h2>
+                <div class="comparison-table mt-8 stagger-reveal interactive-text">
+                    <div class="comp-row comp-header">
+                        <div class="comp-cell">Feature</div>
+                        <div class="comp-cell google-col">Google Maps</div>
+                        <div class="comp-cell garageiq-col">GarageIQ</div>
+                    </div>
+                    <div class="comp-row">
+                        <div class="comp-cell">Data Source</div>
+                        <div class="comp-cell google-col">Star ratings only</div>
+                        <div class="comp-cell garageiq-col"><span class="check-icon">✓</span> 55,000 reviews analyzed</div>
+                    </div>
+                    <div class="comp-row">
+                        <div class="comp-cell">Pricing</div>
+                        <div class="comp-cell google-col">Unknown until you call</div>
+                        <div class="comp-cell garageiq-col"><span class="check-icon">✓</span> Real AED benchmarks</div>
+                    </div>
+                    <div class="comp-row">
+                        <div class="comp-cell">Specialists</div>
+                        <div class="comp-cell google-col">Generic 'auto repair'</div>
+                        <div class="comp-cell garageiq-col"><span class="check-icon">✓</span> Brand & service specific tags</div>
+                    </div>
+                    <div class="comp-row">
+                        <div class="comp-cell">New Garages</div>
+                        <div class="comp-cell google-col">Mixed with top results</div>
+                        <div class="comp-cell garageiq-col"><span class="check-icon">✓</span> Honestly tagged 'Limited Data'</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Key Features -->
+        <section id="features" class="section grid-container bg-white solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">03</div>
+            <div class="content">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>Built for the UAE.</span></h2>
+                <div class="features-list mt-8">
+                    <div class="feature-item stagger-reveal">
+                        <h3 class="mechanical-reveal"><span>Natural-Language Search</span></h3>
+                        <p class="mechanical-reveal"><span>Type like a human. "BMW AC repair in Al Quoz?"</span></p>
+                    </div>
+                    <div class="feature-item stagger-reveal honesty-card-container">
+                        <h3 class="mechanical-reveal"><span>Honest Cold-Start</span></h3>
+                        <p class="mechanical-reveal"><span>We don't fake confidence. If a garage only has 2 reviews, we tell you. No more trusting a 5-star rating from the owner's two cousins.</span></p>
+                        <div class="honesty-card mt-4 interactive-cta flash-on-scroll">
+                            <div class="hc-header">
+                                <span class="hc-name">Al Quoz Auto Centre</span>
+                                <span class="hc-badge">Limited Data</span>
+                            </div>
+                            <div class="hc-body">
+                                <span class="hc-stars">★★☆☆☆</span> <span class="hc-reviews">(2 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-item stagger-reveal">
+                        <h3 class="mechanical-reveal"><span>Real UAE Prices</span></h3>
+                        <p class="mechanical-reveal"><span>See typical AED ranges before you call.</span></p>
+                    </div>
+                    <div class="feature-item stagger-reveal">
+                        <h3 class="mechanical-reveal"><span>Side-by-Side Comparison</span></h3>
+                        <p class="mechanical-reveal"><span>Shortlist garages and compare trust, price, and speed.</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: The Intelligence Network — Command Center HUD -->
+        <section id="intelligence-network" class="section grid-container bg-black solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">04</div>
+            <div class="content z-10 w-full">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>The Intelligence Network.</span></h2>
+                <p class="body-light mt-4 text-center mechanical-reveal"><span>Tracking 8,396 garages in real-time across the UAE.</span></p>
+
+                <div class="hud-grid mt-8">
+                    <!-- Left Panel: Data Readout -->
+                    <div class="hud-panel hud-data-panel">
+                        <div class="hud-panel-header">EMIRATE DATA READOUT</div>
+                        <div class="hud-row" data-emirate-idx="1">
+                            <div class="hud-emirate-name">DUBAI</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="4200">0</span> GARAGES / <span class="e-count" data-val="28000">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="0">
+                            <div class="hud-emirate-name">ABU DHABI</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="2143">0</span> GARAGES / <span class="e-count" data-val="14000">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="2">
+                            <div class="hud-emirate-name">SHARJAH</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="1250">0</span> GARAGES / <span class="e-count" data-val="8000">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="3">
+                            <div class="hud-emirate-name">AJMAN</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="320">0</span> GARAGES / <span class="e-count" data-val="2000">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="4">
+                            <div class="hud-emirate-name">UMM AL QUWAIN</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="140">0</span> GARAGES / <span class="e-count" data-val="900">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="5">
+                            <div class="hud-emirate-name">RAS AL KHAIMAH</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="210">0</span> GARAGES / <span class="e-count" data-val="1500">0</span> REVIEWS</div>
+                        </div>
+                        <div class="hud-row" data-emirate-idx="6">
+                            <div class="hud-emirate-name">FUJAIRAH</div>
+                            <div class="hud-emirate-stats"><span class="e-count" data-val="133">0</span> GARAGES / <span class="e-count" data-val="800">0</span> REVIEWS</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: 3D Network Canvas -->
+                    <div class="hud-panel hud-canvas-panel">
+                        <canvas id="pixel-map" width="800" height="500"></canvas>
+
+                        <!-- Subtle Geographic Canvas Labels -->
+                        <div class="canvas-label" data-target="0" style="bottom: 30%; left: 30%;">ABU DHABI &middot; 2,143</div>
+                        <div class="canvas-label" data-target="1" style="top: 35%; left: 60%;">DUBAI &middot; 4,200</div>
+                        <div class="canvas-label" data-target="2" style="top: 30%; left: 70%;">SHARJAH &middot; 1,250</div>
+                        <div class="canvas-label" data-target="3" style="top: 25%; left: 75%;">AJMAN &middot; 320</div>
+                        <div class="canvas-label" data-target="4" style="top: 20%; left: 80%;">UMM AL QUWAIN &middot; 140</div>
+                        <div class="canvas-label" data-target="5" style="top: 15%; left: 85%;">RAS AL KHAIMAH &middot; 210</div>
+                        <div class="canvas-label" data-target="6" style="top: 45%; left: 90%;">FUJAIRAH &middot; 133</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: How it Works -->
+        <section id="how-it-works" class="section grid-container bg-white solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">05</div>
+            <div class="content">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>How it works.</span></h2>
+                <div class="how-it-works-grid mt-8">
+                    <div class="step-item stagger-reveal interactive-cta">
+                        <div class="step-numeral">1</div>
+                        <h3 class="mechanical-reveal"><span>Type your problem</span></h3>
+                    </div>
+                    <div class="step-item stagger-reveal interactive-cta">
+                        <div class="step-numeral">2</div>
+                        <h3 class="mechanical-reveal"><span>AI scans the evidence</span></h3>
+                    </div>
+                    <div class="step-item stagger-reveal interactive-cta">
+                        <div class="step-numeral">3</div>
+                        <h3 class="mechanical-reveal"><span>Call the right specialist</span></h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Voices from the Road (Testimonials) -->
+        <section id="testimonials" class="section grid-container bg-white solid-bg pt-0">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="content">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>Voices from the road.</span></h2>
+                <div class="testimonials-grid mt-8">
+                    <div class="testimonial-card interactive-text mechanical-reveal">
+                        <span>
+                            <p class="testimonial-quote">"I was new to Dubai and terrified of getting scammed. GarageIQ found me a specialist for my BMW in 10 seconds. Saved me 500 AED."</p>
+                            <p class="testimonial-author mt-4">— Expat, Dubai</p>
+                        </span>
+                    </div>
+                    <div class="testimonial-card interactive-text mechanical-reveal">
+                        <span>
+                            <p class="testimonial-quote">"I love that I can filter for 'Budget' and still see a high Trust Score. Finally, cheap doesn't mean shady."</p>
+                            <p class="testimonial-author mt-4">— Budget Driver, Sharjah</p>
+                        </span>
+                    </div>
+                    <div class="testimonial-card interactive-text mechanical-reveal">
+                        <span>
+                            <p class="testimonial-quote">"We specialize in German cars. GarageIQ sends us customers who actually want German specialists, not just people looking for the cheapest oil change."</p>
+                            <p class="testimonial-author mt-4">— Garage Owner, Al Quoz</p>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Claim Your AI Profile (B2B) -->
+        <section id="b2b" class="section grid-container bg-white solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="parallax-numeral" data-speed="0.2">06</div>
+            <div class="content text-center">
+                <h2 class="headline-heavy mechanical-reveal"><span>Are you a garage owner?</span></h2>
+                <p class="body-light mt-4 mechanical-reveal"><span>Stop competing on Google Ads. Claim your AI profile.</span></p>
+                <div class="b2b-grid mt-8">
+                    <div class="b2b-card interactive-cta garage-door-trigger stagger-reveal">
+                        <div class="garage-door"></div>
+                        <div class="b2b-content">
+                            <h3 class="mechanical-reveal"><span>High-Intent Leads</span></h3>
+                            <p class="mechanical-reveal"><span>Connect with owners who need your specific expertise.</span></p>
+                        </div>
+                    </div>
+                    <div class="b2b-card interactive-cta garage-door-trigger stagger-reveal">
+                        <div class="garage-door"></div>
+                        <div class="b2b-content">
+                            <h3 class="mechanical-reveal"><span>Review Analytics</span></h3>
+                            <p class="mechanical-reveal"><span>Understand exactly what customers are saying.</span></p>
+                        </div>
+                    </div>
+                    <div class="b2b-card interactive-cta garage-door-trigger stagger-reveal">
+                        <div class="garage-door"></div>
+                        <div class="b2b-content">
+                            <h3 class="mechanical-reveal"><span>Trust Building</span></h3>
+                            <p class="mechanical-reveal"><span>Verify your credentials and boost your Trust Score.</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- B2B Pricing Cards -->
+                <div class="pricing-grid mt-8">
+                    <div class="pricing-card interactive-cta stagger-reveal">
+                        <h3>Free Profile</h3>
+                        <p>Claim your profile, update hours, respond to reports.</p>
+                        <div class="price mt-4">AED 0</div>
+                    </div>
+                    <div class="pricing-card interactive-cta stagger-reveal">
+                        <h3>Premium Growth</h3>
+                        <p>Priority ranking, direct WhatsApp leads, advanced analytics dashboard, 'Verified' badge.</p>
+                        <div class="price mt-4">AED 300<span class="text-sm">/mo</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Trust Manifesto -->
+        <section id="trust-manifesto" class="section grid-container bg-white solid-bg pt-0">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="content" style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <h2 class="headline-heavy mechanical-reveal"><span>We built GarageIQ because we were tired of getting ripped off.</span></h2>
+                <p class="body-light mt-8 mechanical-reveal" style="font-size: 1.25rem; font-weight: 400; text-align: left;">
+                    <span>As expats in the UAE, we know the anxiety of a sudden car problem. You open Google Maps, see 40 pins with 4.5 stars, and cross your fingers. You don't know if they know your car's brand, you don't know if they'll overcharge you, and you don't know if that 5-star rating came from a real customer or the owner's cousins.</span>
+                </p>
+                <p class="body-light mt-4 mechanical-reveal" style="font-size: 1.25rem; font-weight: 400; text-align: left;">
+                    <span>GarageIQ exists to kill that anxiety. We use AI not to replace human mechanics, but to organize their reputations. We structure the chaos of reviews into clear, honest signals: who to trust, what it should cost, and who specializes in your exact problem. No booking fees, no middlemen. Just the truth, structured.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- Expanded Brutalist FAQ -->
+        <section id="faq" class="section grid-container bg-white solid-bg pt-0">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="content">
+                <h2 class="headline-heavy text-center mechanical-reveal"><span>FAQ.</span></h2>
+                <div class="faq-list mt-8">
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">How does GarageIQ calculate Trust Scores?</button>
+                        <div class="faq-answer"><p>Our AI analyzes thousands of reviews for mentions of transparency, reliability, complaint density, and repeat-visit language. It's an aggregate of sentiment, not just an average of star ratings. A 4.5-star rating doesn't mean much if all the text reviews mention overcharging.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">What does "Limited Data" mean?</button>
+                        <div class="faq-answer"><p>If a garage has fewer than 5 reviews, we don't have enough evidence to generate a reliable AI profile. Instead of faking a high confidence score, we tag them as "Limited Data" so you know to proceed with caution. We never fake confidence.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">Can I book an appointment directly through the app?</button>
+                        <div class="faq-answer"><p>No. GarageIQ is a discovery and intelligence tool, not a booking platform. We give you the exact context you need (trust, price, specialty) so you can call or WhatsApp the garage directly. This ensures you speak directly to the mechanic, with zero middleman fees.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">How do you find the Real UAE Price benchmarks?</button>
+                        <div class="faq-answer"><p>Our AI scans review text for mentions of specific AED amounts paid by customers for various services (e.g., "paid 600 for an AC compressor"), aggregating them into realistic market ranges so you know if you're being overcharged before you even call.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">Is the app available in Arabic?</button>
+                        <div class="faq-answer"><p>Yes. The entire GarageIQ experience, including our AI-generated garage summaries and natural language search, is fully translated and localized for Right-to-Left (RTL) Arabic layouts. You can also use voice search in Arabic.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">How often is the garage data updated?</button>
+                        <div class="faq-answer"><p>Our pipeline runs nightly to ingest new Google reviews, re-analyze sentiment, and update Trust Scores. Price benchmarks are continuously updated as new review text flows in.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">Do you filter out fake reviews?</button>
+                        <div class="faq-answer"><p>While we rely on Google's review ecosystem, our AI is trained to weight specific, detailed reviews over generic, one-word 5-star ratings. Sudden bursts of generic 5-star reviews have minimal impact on the final Trust Score compared to consistent, detailed evidence.</p></div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question interactive-cta">Is GarageIQ free for car owners?</button>
+                        <div class="faq-answer"><p>Yes, 100%. GarageIQ is completely free for UAE car owners. We make money by offering premium listings and analytics to garage owners, never by charging users for information.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marquee Strip -->
+        <div class="marquee-strip-wrapper bg-black">
+            <div class="marquee-strip">
+                <span class="marquee-text">TRUSTED INTELLIGENCE &mdash; 8,396 GARAGES &mdash; 55,214 REVIEWS &mdash; TRUSTED INTELLIGENCE &mdash; 8,396 GARAGES &mdash; 55,214 REVIEWS &mdash;</span>
+            </div>
+        </div>
+
+        <!-- Section 8: Final CTA -->
+        <section id="final-cta" class="section grid-container viewport-height flex-col-center bg-black solid-bg">
+            <div class="grid-line left-line"></div>
+            <div class="grid-line right-line"></div>
+            <div class="content text-center z-10">
+                <h2 class="headline-heavy mechanical-reveal"><span>Stop guessing.</span><br><span>Start knowing.</span></h2>
+                <p class="body-light mt-4 mechanical-reveal"><span>Add GarageIQ to your home screen. No App Store required.</span></p>
+                <div class="mt-8 mechanical-reveal">
+                    <span><a href="#get" class="btn-primary pill-btn magnetic-btn interactive-cta">Get GarageIQ Free</a></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9: The Grid Network Footer -->
+        <section id="footer-grid" class="solid-bg bg-white grid-footer-container">
+            <div class="footer-grid">
+                <div class="fg-cell fg-draw interactive-text">Dubai</div>
+                <div class="fg-cell fg-draw interactive-text">Abu Dhabi</div>
+                <div class="fg-cell fg-draw interactive-text">Sharjah</div>
+                <div class="fg-cell fg-draw interactive-text">Ajman</div>
+                <div class="fg-cell fg-draw interactive-text">German Specs</div>
+                <div class="fg-cell fg-draw interactive-text">Japanese Specs</div>
+                <div class="fg-cell fg-draw interactive-text">AC Repair</div>
+                <div class="fg-cell fg-draw interactive-text">Transmission</div>
+                <div class="fg-cell fg-draw interactive-text">Tyres</div>
+                <div class="fg-cell fg-draw interactive-text">Bodywork</div>
+                <div class="fg-cell fg-draw interactive-text">About GarageIQ</div>
+                <div class="fg-cell fg-draw interactive-text">Terms & Privacy</div>
+            </div>
+        </section>
+
+    </div> <!-- end scrolling overlay -->
+
+    <script src="uae-paths.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
