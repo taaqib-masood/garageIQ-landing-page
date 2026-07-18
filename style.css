@@ -684,7 +684,7 @@ body {
     font-weight: 400;
     letter-spacing: 0.2em;
     color: rgba(255, 255, 255, 0.4);
-    padding: 8px 16px;
+    padding: 6px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     opacity: 0;
     transition: opacity 0.3s var(--ease-brutal);
@@ -696,7 +696,7 @@ body {
 }
 
 .hud-row {
-    padding: 10px 16px;
+    padding: 8px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     opacity: 0;
     transform: translateX(-20px);
@@ -1116,6 +1116,80 @@ body {
 .fg-cell:hover {
     background: var(--text-color);
     color: #FFF;
+}
+
+/* Waitlist Section */
+.waitlist-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.waitlist-input-group {
+    display: flex;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.waitlist-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #FFF;
+    padding: 1rem 1.5rem;
+    font-family: var(--font-family);
+    font-size: 1.125rem;
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.waitlist-input:focus {
+    border-color: #FFF;
+}
+
+.waitlist-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.waitlist-btn {
+    border-radius: 0;
+    padding: 1rem 2rem;
+    margin-left: -1px; /* Overlap border */
+    position: relative;
+    z-index: 2;
+}
+
+.waitlist-microcopy {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 300;
+}
+
+.app-teasers {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.app-teaser-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    color: #FFF;
+    opacity: 0.6;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: -0.02em;
+}
+
+.app-teaser-pill svg {
+    width: 16px;
+    height: 16px;
 }
 
 

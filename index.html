@@ -30,7 +30,7 @@
             </div>
             <p class="subheadline-light mt-4 mechanical-reveal"><span>AI-powered garage discovery for UAE car owners.</span><br><span>Stop guessing between 4.5 stars. Start knowing.</span></p>
             <div class="cta-group mt-8 mechanical-reveal">
-                <span><a href="#search" class="btn-primary pill-btn magnetic-btn interactive-cta">Start Searching</a></span>
+                <span><a href="#waitlist" class="btn-primary pill-btn magnetic-btn interactive-cta">Join Early Access</a></span>
                 <span><a href="#how-it-works" class="btn-secondary link-hover interactive-text">How it works</a></span>
             </div>
         </div>
@@ -187,6 +187,10 @@
                         <h3 class="mechanical-reveal"><span>Side-by-Side Comparison</span></h3>
                         <p class="mechanical-reveal"><span>Shortlist garages and compare trust, price, and speed.</span></p>
                     </div>
+                    <div class="feature-item stagger-reveal">
+                        <h3 class="mechanical-reveal"><span>Always Free for Drivers</span></h3>
+                        <p class="mechanical-reveal"><span>GarageIQ is 100% free for car owners. No ads, no middleman booking fees. We make money by helping garages get discovered, never by charging you for the truth.</span></p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -196,15 +200,15 @@
             <div class="grid-line left-line"></div>
             <div class="grid-line right-line"></div>
             <div class="parallax-numeral" data-speed="0.2">04</div>
-            <div class="content z-10 w-full">
-                <h2 class="headline-heavy text-center mechanical-reveal"><span>The Intelligence Network.</span></h2>
-                <p class="body-light mt-4 text-center mechanical-reveal"><span>Tracking 8,396 garages in real-time across the UAE.</span></p>
+            <div class="content z-10 w-full" style="padding-top: 2rem; padding-bottom: 2rem;">
+                <h2 class="headline-heavy text-center mechanical-reveal" style="font-size: clamp(3rem, 6vw, 5rem);"><span>The Intelligence Network.</span></h2>
+                <p class="body-light mt-2 text-center mechanical-reveal"><span>Tracking 8,396 garages in real-time across the UAE.</span></p>
 
-                <div class="hud-grid mt-8">
+                <div class="hud-grid mt-4">
                     <!-- Left Panel: Data Readout -->
                     <div class="hud-panel hud-data-panel">
                         <div class="hud-panel-header">EMIRATE DATA READOUT</div>
-                        <div class="hud-row" data-emirate-idx="1">
+                        <div class="hud-row" data-emirate-idx="2">
                             <div class="hud-emirate-name">DUBAI</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="4200">0</span> GARAGES / <span class="e-count" data-val="28000">0</span> REVIEWS</div>
                         </div>
@@ -212,11 +216,11 @@
                             <div class="hud-emirate-name">ABU DHABI</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="2143">0</span> GARAGES / <span class="e-count" data-val="14000">0</span> REVIEWS</div>
                         </div>
-                        <div class="hud-row" data-emirate-idx="2">
+                        <div class="hud-row" data-emirate-idx="1">
                             <div class="hud-emirate-name">SHARJAH</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="1250">0</span> GARAGES / <span class="e-count" data-val="8000">0</span> REVIEWS</div>
                         </div>
-                        <div class="hud-row" data-emirate-idx="3">
+                        <div class="hud-row" data-emirate-idx="6">
                             <div class="hud-emirate-name">AJMAN</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="320">0</span> GARAGES / <span class="e-count" data-val="2000">0</span> REVIEWS</div>
                         </div>
@@ -224,11 +228,11 @@
                             <div class="hud-emirate-name">UMM AL QUWAIN</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="140">0</span> GARAGES / <span class="e-count" data-val="900">0</span> REVIEWS</div>
                         </div>
-                        <div class="hud-row" data-emirate-idx="5">
+                        <div class="hud-row" data-emirate-idx="3">
                             <div class="hud-emirate-name">RAS AL KHAIMAH</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="210">0</span> GARAGES / <span class="e-count" data-val="1500">0</span> REVIEWS</div>
                         </div>
-                        <div class="hud-row" data-emirate-idx="6">
+                        <div class="hud-row" data-emirate-idx="5">
                             <div class="hud-emirate-name">FUJAIRAH</div>
                             <div class="hud-emirate-stats"><span class="e-count" data-val="133">0</span> GARAGES / <span class="e-count" data-val="800">0</span> REVIEWS</div>
                         </div>
@@ -239,13 +243,13 @@
                         <canvas id="pixel-map" width="800" height="500"></canvas>
 
                         <!-- Subtle Geographic Canvas Labels -->
-                        <div class="canvas-label" data-target="0" style="bottom: 30%; left: 30%;">ABU DHABI &middot; 2,143</div>
-                        <div class="canvas-label" data-target="1" style="top: 35%; left: 60%;">DUBAI &middot; 4,200</div>
-                        <div class="canvas-label" data-target="2" style="top: 30%; left: 70%;">SHARJAH &middot; 1,250</div>
-                        <div class="canvas-label" data-target="3" style="top: 25%; left: 75%;">AJMAN &middot; 320</div>
-                        <div class="canvas-label" data-target="4" style="top: 20%; left: 80%;">UMM AL QUWAIN &middot; 140</div>
-                        <div class="canvas-label" data-target="5" style="top: 15%; left: 85%;">RAS AL KHAIMAH &middot; 210</div>
-                        <div class="canvas-label" data-target="6" style="top: 45%; left: 90%;">FUJAIRAH &middot; 133</div>
+                        <div class="canvas-label" data-target="0" style="top: 55%; left: 40%;">ABU DHABI &middot; 2,143</div>
+                        <div class="canvas-label" data-target="2" style="top: 33%; left: 66%;">DUBAI &middot; 4,200</div>
+                        <div class="canvas-label" data-target="1" style="top: 23%; left: 68%;">SHARJAH &middot; 1,250</div>
+                        <div class="canvas-label" data-target="6" style="top: 17%; left: 64%;">AJMAN &middot; 320</div>
+                        <div class="canvas-label" data-target="4" style="top: 21%; left: 72%;">UMM AL QUWAIN &middot; 140</div>
+                        <div class="canvas-label" data-target="3" style="top: 26%; left: 74%;">RAS AL KHAIMAH &middot; 210</div>
+                        <div class="canvas-label" data-target="5" style="top: 30%; left: 70%;">FUJAIRAH &middot; 133</div>
                     </div>
                 </div>
             </div>
@@ -417,15 +421,30 @@
             </div>
         </div>
 
-        <!-- Section 8: Final CTA -->
-        <section id="final-cta" class="section grid-container viewport-height flex-col-center bg-black solid-bg">
+        <!-- Section 8: Waitlist CTA -->
+        <section id="waitlist" class="section grid-container viewport-height flex-col-center bg-black solid-bg">
             <div class="grid-line left-line"></div>
             <div class="grid-line right-line"></div>
-            <div class="content text-center z-10">
+            <div class="content text-center z-10 w-full" style="max-width: 600px; margin: 0 auto;">
                 <h2 class="headline-heavy mechanical-reveal"><span>Stop guessing.</span><br><span>Start knowing.</span></h2>
-                <p class="body-light mt-4 mechanical-reveal"><span>Add GarageIQ to your home screen. No App Store required.</span></p>
-                <div class="mt-8 mechanical-reveal">
-                    <span><a href="#get" class="btn-primary pill-btn magnetic-btn interactive-cta">Get GarageIQ Free</a></span>
+                
+                <form class="waitlist-form mt-8 w-full mechanical-reveal">
+                    <div class="waitlist-input-group">
+                        <input type="email" placeholder="Your email address" class="waitlist-input interactive-cta" required>
+                        <button type="submit" class="btn-primary magnetic-btn interactive-cta waitlist-btn">Get Early Access</button>
+                    </div>
+                    <p class="waitlist-microcopy mt-4">We respect your privacy. No spam, just a launch notification.</p>
+                </form>
+
+                <div class="app-teasers mt-8 mechanical-reveal">
+                    <div class="app-teaser-pill">
+                        <svg viewBox="0 0 384 512" fill="currentColor"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.3 48.6-.6 88.5-84.8 100.9-123.7-46.7-25-60.6-67-60-109.1zM245.5 106.8c18-22 30.6-53.5 27.2-84.8-26.5 1.1-59 17.6-77.9 39.5-16.7 19.4-31.5 27.5-82.2 29.5 2.2 60.1-15.3 78.2-36.9z"/></svg>
+                        Coming Soon to App Store
+                    </div>
+                    <div class="app-teaser-pill">
+                        <svg viewBox="0 0 512 512" fill="currentColor"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>
+                        Coming Soon to Google Play
+                    </div>
                 </div>
             </div>
         </section>

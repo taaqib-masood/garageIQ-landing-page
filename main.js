@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- UAE shape from real SVG paths (viewBox: 0 0 760 613) ---
         const svgW = 760, svgH = 613;
         const scaleRatio = Math.min(700 / svgW, 450 / svgH);
-        const offsetX = (800 - svgW * scaleRatio) / 2;
+        const offsetX = ((800 - svgW * scaleRatio) / 2) - 60; // Shift map explicitly left
         const offsetY = (500 - svgH * scaleRatio) / 2;
 
         const hiddenCanvas = document.createElement('canvas');
@@ -273,7 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (inside) {
                     for (let z = -50; z <= 50; z += gridSize) {
-                        if (Math.random() < 0.3) {
+                        let densityThreshold = 0.3;
+                        // Increase density for RAK (3), UAQ (4), Fujairah (5), and Ajman (6)
+                        if ([3, 4, 5, 6].includes(matchedPath)) {
+                            densityThreshold = 0.9;
+                        }
+                        if (Math.random() < densityThreshold) {
                             nodes.push({
                                 x, y, z,
                                 index: nodes.length,
@@ -458,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (hoveredPathIndex !== -1) {
                         // Hover mode active
                         if (node.pathIndex === hoveredPathIndex) {
-                            scalesArr[idx] = 1.0;
+                            scalesArr[idx] = 1.2;
                             alphasArr[idx] = 1.0;
                         } else {
                             scalesArr[idx] = popProgress * 0.8;
