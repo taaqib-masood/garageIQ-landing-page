@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 0. Brutalist Custom Cursor
+    // 0. The "Ink Ring" Custom Cursor
     const cursor = document.getElementById('brutalist-cursor');
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+    
     if (cursor) {
-        // Track mouse position globally
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
-        });
+        if (isTouch) {
+            cursor.style.display = 'none';
+        } else {
+            // Track mouse position globally
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
+            });
 
         // Hover states for CTAs
         document.querySelectorAll('.interactive-cta').forEach(el => {
@@ -14,11 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('mouseleave', () => cursor.classList.remove('cta-hover'));
         });
 
-        // Hover states for text/links
-        document.querySelectorAll('.interactive-text, h1, h2, h3, p').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('text-hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('text-hover'));
-        });
+            // Hover states for text/links
+            document.querySelectorAll('.interactive-text, h1, h2, h3, p').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('text-hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('text-hover'));
+            });
+        }
     }
 
     // 1. Scroll-Progress Hairline
@@ -188,14 +194,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 8. Fixed-Perspective Neural Pulse — 3D network inside UAE silhouette
     const canvas = document.getElementById('pixel-map');
     if (canvas && typeof THREE !== 'undefined' && typeof UAE_PATHS !== 'undefined') {
+        const container = canvas.parentElement;
+        const width = container.clientWidth || window.innerWidth;
+        const height = container.clientHeight || 500;
+        
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(800, 500);
+        renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 800 / 500, 1, 1000);
-        // LOCKED camera: slight downward angle, frozen
-        camera.position.set(0, 80, 580);
+        const aspect = width / height;
+        const camera = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
+        
+        // On narrow screens (mobile), push the camera back to keep the entire UAE in frame
+        const cameraZ = aspect < 1 ? 580 * (1.5 / aspect) : 580; 
+        camera.position.set(0, 80, cameraZ);
         camera.lookAt(0, 0, 0);
 
         const group = new THREE.Group();
@@ -211,15 +224,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- UAE shape from real SVG paths (viewBox: 0 0 760 613) ---
         const svgW = 760, svgH = 613;
-        const isMobileMap = window.innerWidth <= 768;
-        const scaleMult = isMobileMap ? 0.7 : 1.0;
-        const scaleRatio = Math.min(700 / svgW, 450 / svgH) * scaleMult;
-        const offsetX = ((800 - svgW * scaleRatio) / 2) - (isMobileMap ? -10 : 60); 
-        const offsetY = ((500 - svgH * scaleRatio) / 2) - (isMobileMap ? 30 : 0);
+        
+        // Scale the SVG projection based on actual renderer dimensions
+        const scaleMult = 0.9; // Fit nicely within bounds
+        const scaleRatio = Math.min(width / svgW, height / svgH) * scaleMult;
+        
+        // Center the projection perfectly inside the container
+        const offsetX = ((width - svgW * scaleRatio) / 2); 
+        const offsetY = ((height - svgH * scaleRatio) / 2) + 20;
 
         const hiddenCanvas = document.createElement('canvas');
-        hiddenCanvas.width = 800;
-        hiddenCanvas.height = 500;
+        hiddenCanvas.width = width;
+        hiddenCanvas.height = height;
         const hCtx = hiddenCanvas.getContext('2d');
         
         const emiratePaths = [];

@@ -37,41 +37,39 @@ body {
     *, a, button { cursor: none !important; }
 }
 
-/* Brutalist Custom Cursor */
+/* The "Ink Ring" Cursor */
 #brutalist-cursor {
     position: fixed;
     top: 0;
     left: 0;
-    width: 12px;
-    height: 12px;
-    background: var(--text-color);
+    width: 16px;
+    height: 16px;
+    border: 1px solid #FFFFFF; /* Renders black on white via difference mode */
+    background: transparent;
+    border-radius: 50%;
     pointer-events: none;
     z-index: 10000;
     transform: translate(-50%, -50%);
     will-change: transform, width, height, background;
-    transition: width 0.3s var(--ease-brutal), 
-                height 0.3s var(--ease-brutal),
-                background 0.3s var(--ease-brutal);
+    transition: width 0.2s var(--ease-brutal), 
+                height 0.2s var(--ease-brutal),
+                background 0.2s var(--ease-brutal),
+                border-width 0.2s var(--ease-brutal);
     mix-blend-mode: difference;
 }
 
-/* Need to handle difference mode on white/black backgrounds dynamically 
-   Difference: Black(0) on White(255) = White(255). We want Black cursor! 
-   Wait, if background is #0A0A0A, difference with white cursor gives white. 
-   Actually, it's simpler to set cursor background to white, and difference mix-blend makes it inverse of what's behind it.
-*/
-#brutalist-cursor {
-    background: #FFFFFF; 
-}
-
 #brutalist-cursor.text-hover {
-    width: 2px;
-    height: 24px;
+    width: 4px;
+    height: 4px;
+    background: #FFFFFF;
+    border-width: 0;
 }
 
 #brutalist-cursor.cta-hover {
     width: 40px;
     height: 40px;
+    background: #FFFFFF;
+    border-width: 0;
 }
 
 /* Utilities */
@@ -790,12 +788,6 @@ body {
     z-index: 10;
     transform: translate(-50%, -50%);
     transition: opacity 0.3s var(--ease-brutal), text-shadow 0.3s var(--ease-brutal);
-}
-
-@media (max-width: 768px) {
-    .canvas-label {
-        display: none;
-    }
 }
 
 .canvas-label.is-active {
