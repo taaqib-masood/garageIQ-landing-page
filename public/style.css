@@ -1095,43 +1095,94 @@ body {
     100% { transform: translateX(-50%); } 
 }
 
-/* Footer Grid */
-.grid-footer-container {
+/* Footer Monolith */
+.monolith-wordmark {
+    font-size: clamp(80px, 25vw, 300px);
+    font-family: var(--font-family);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: #FFFFFF;
+    line-height: 0.9;
+    margin: 0;
     padding: 0;
-    scroll-snap-align: start;
 }
 
-.footer-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    border-top: 1px solid var(--border-color);
+.monolith-wordmark span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s var(--ease-brutal),
+                transform 0.8s var(--ease-brutal);
 }
 
-@media (min-width: 768px) {
-    .footer-grid { grid-template-columns: repeat(4, 1fr); }
+.is-visible .monolith-wordmark span {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.fg-cell {
-    border-right: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    padding: 3rem 1.5rem;
-    text-align: center;
+.monolith-fade {
+    opacity: 0;
+    transition: opacity 0.8s var(--ease-brutal);
+}
+
+.is-visible .monolith-fade {
+    opacity: 1;
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-links a {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
     font-weight: 600;
-    font-size: 1.125rem;
-    background: #FFF;
-    color: var(--text-color);
-    transition: background 0s, color 0s, transform 0.8s var(--ease-brutal);
-    transform: scaleY(0);
-    transform-origin: top;
+    letter-spacing: 0.1em;
+    color: #FFFFFF;
+    opacity: 0.5;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.2s var(--ease-brutal), color 0s, background 0s;
+    padding: 2px 4px;
 }
 
-.grid-footer-container.is-visible .fg-cell {
-    transform: scaleY(1);
+.footer-links a:hover {
+    opacity: 1;
+    color: #0A0A0A;
+    background: #FFFFFF;
 }
 
-.fg-cell:hover {
-    background: var(--text-color);
-    color: #FFF;
+.dot-separator {
+    color: #FFFFFF;
+    opacity: 0.3;
+}
+
+.footer-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    border-top: 1px solid #FFFFFF;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    color: #FFFFFF;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .footer-bottom-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
 }
 
 /* Waitlist Section */
