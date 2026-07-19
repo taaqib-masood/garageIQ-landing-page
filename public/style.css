@@ -1097,7 +1097,7 @@ body {
 
 /* Footer Monolith */
 .monolith-wordmark {
-    font-size: clamp(80px, 25vw, 300px);
+    font-size: clamp(60px, 15vw, 160px);
     font-family: var(--font-family);
     font-weight: 800;
     letter-spacing: -0.05em;
@@ -1174,6 +1174,7 @@ body {
 .footer-links a {
     position: relative;
     overflow: hidden;
+    z-index: 1;
     font-family: 'Courier New', Courier, monospace;
     font-size: 12px;
     font-weight: 600;
@@ -1219,12 +1220,22 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    translate: -50% -50%;
     width: 60vw;
     height: 60vh;
-    opacity: 0.05;
+    opacity: 0.15;
     pointer-events: none;
     z-index: 0;
+    animation: botanicalSpin 60s linear infinite, botanicalBreathe 6s ease-in-out infinite alternate;
+}
+
+@keyframes botanicalSpin {
+    to { rotate: 360deg; }
+}
+
+@keyframes botanicalBreathe {
+    from { scale: 1; }
+    to { scale: 1.1; }
 }
 
 .botanical-monolith path {
@@ -1233,7 +1244,7 @@ body {
     fill: none;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    transition: stroke-dashoffset 2.5s cubic-bezier(0.83, 0, 0.17, 1);
+    transition: stroke-dashoffset 2s cubic-bezier(0.83, 0, 0.17, 1);
 }
 
 .is-visible .botanical-monolith path {
