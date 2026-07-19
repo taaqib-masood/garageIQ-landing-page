@@ -650,4 +650,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { threshold: 0.2 });
         mapObserver.observe(canvas);
     }
+
+    // 9. Supabase Waitlist Integration
+    const supabaseUrl = 'https://zbqtaiozkhfscwynddjd.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXRhaW96a2hmc2N3eW5kZGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkzNjcsImV4cCI6MjA5NDI2NTM2N30.alfx8gruhDhJr1L_zwNt0xrzAaxJdkcgIFnyZdtofa0';
+    
+    if (typeof supabase !== 'undefined') {
+        const db = supabase.createClient(supabaseUrl, supabaseAnonKey);
+        const waitlistForm = document.querySelector('.waitlist-form');
+        
+        if (waitlistForm) {
+            waitlistForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const emailInput = waitlistForm.querySelector('input[type="email"]');
+                const btn = waitlistForm.querySelector('button[type="submit"]');
+                const email = emailInput.value.trim();
+                
+                if (!email) return;
+                
+                // Loading state
+                btn.textContent = 'Joining...';
+                btn.style.opacity = '0.7';
+                btn.style.pointerEvents = 'none';
+                
+                // Insert into Supabase (silently ignore errors or duplicates for a smooth UX)
+                const { error } = await db.from('waitlist').insert([{ email }]);
+                
+                // Success Morph (Mechanical Slide-up)
+                waitlistForm.innerHTML = `
+                    <div class="mechanical-reveal" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div style="transform: translateY(100%); animation: slideUpBrutal 0.8s cubic-bezier(0.83, 0, 0.17, 1) forwards;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="margin: 0 auto 12px auto; display: block;">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list.</h3>
+                            <p class="waitlist-microcopy mt-2">We'll notify you at launch.</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    }
 });
