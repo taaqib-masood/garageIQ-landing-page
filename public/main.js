@@ -195,21 +195,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('pixel-map');
     if (canvas && typeof THREE !== 'undefined' && typeof UAE_PATHS !== 'undefined') {
         const container = canvas.parentElement;
-        const width = container.clientWidth || window.innerWidth;
-        const height = container.clientHeight || 500;
         
         const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
         const scene = new THREE.Scene();
-        const aspect = width / height;
-        const camera = new THREE.PerspectiveCamera(45, aspect, 1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
         
-        // On narrow screens (mobile), push the camera back to keep the entire UAE in frame
-        const cameraZ = aspect < 1 ? 580 * (1.5 / aspect) : 580; 
-        camera.position.set(0, 80, cameraZ);
-        camera.lookAt(0, 0, 0);
+        // Define virtual coordinate system for the map (always 800x500)
+        const VIRTUAL_W = 800;
+        const VIRTUAL_H = 500;
+        
+        function updateMapLayout() {
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || 500;
+            const isMobile = window.innerWidth <= 768;
+            
+            renderer.setSize(width, height);
+            
+            const aspect = width / height;
+            camera.aspect = aspect;
+            
+            // If mobile, pull camera way back so the wide map fits. If desktop, pull back slightly if narrow.
+            if (isMobile) {
+                camera.position.set(0, 80, 580 * (1.8 / aspect));
+            } else {
+                camera.position.set(0, 80, aspect < 1.6 ? 580 * (1.6 / aspect) : 580);
+            }
+            camera.lookAt(0, 0, 0);
+            camera.updateProjectionMatrix();
+        }
+        
+        // Initial layout
+        updateMapLayout();
+        window.addEventListener('resize', updateMapLayout);
 
         const group = new THREE.Group();
         // Fixed 15-degree tilt for depth perception, never changes
@@ -225,17 +244,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- UAE shape from real SVG paths (viewBox: 0 0 760 613) ---
         const svgW = 760, svgH = 613;
         
-        // Scale the SVG projection based on actual renderer dimensions
-        const scaleMult = 0.9; // Fit nicely within bounds
-        const scaleRatio = Math.min(width / svgW, height / svgH) * scaleMult;
+        // Lock point generation scale to the virtual 800x500 canvas
+        const scaleRatio = Math.min(VIRTUAL_W / svgW, VIRTUAL_H / svgH) * 0.95;
         
-        // Center the projection perfectly inside the container
-        const offsetX = ((width - svgW * scaleRatio) / 2); 
-        const offsetY = ((height - svgH * scaleRatio) / 2) + 20;
+        // Explicitly center and shift for desktop alignment with HTML labels
+        const offsetX = ((VIRTUAL_W - svgW * scaleRatio) / 2) - 40; 
+        const offsetY = ((VIRTUAL_H - svgH * scaleRatio) / 2);
 
         const hiddenCanvas = document.createElement('canvas');
-        hiddenCanvas.width = width;
-        hiddenCanvas.height = height;
+        hiddenCanvas.width = VIRTUAL_W;
+        hiddenCanvas.height = VIRTUAL_H;
         const hCtx = hiddenCanvas.getContext('2d');
         
         const emiratePaths = [];

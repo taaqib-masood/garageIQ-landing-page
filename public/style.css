@@ -681,11 +681,19 @@ body {
 
 /* Left Data Panel */
 .hud-data-panel {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (min-width: 768px) {
+    .hud-data-panel {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .hud-panel-header {
+    grid-column: 1 / -1;
     font-family: 'Courier New', Courier, monospace;
     font-size: 10px;
     font-weight: 400;
