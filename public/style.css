@@ -1172,6 +1172,9 @@ body {
 }
 
 .footer-links a {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
     font-family: 'Courier New', Courier, monospace;
     font-size: 12px;
     font-weight: 600;
@@ -1181,16 +1184,30 @@ body {
     text-transform: uppercase;
     text-decoration: none;
     padding: 4px 8px;
-    background: linear-gradient(to top, #FFFFFF 50%, transparent 50%);
-    background-size: 100% 200%;
-    background-position: bottom;
-    transition: background-position 0.3s cubic-bezier(0.83, 0, 0.17, 1), color 0s linear 0.15s, opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+    transition: opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1), color 0s;
+}
+
+.footer-links a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #FFFFFF;
+    transform: translateY(100%);
+    transition: transform 0s;
+    z-index: -1;
 }
 
 .footer-links a:hover {
     opacity: 1;
-    background-position: top;
     color: #000000;
+}
+
+.footer-links a:hover::before {
+    transform: translateY(0%);
+    transition: transform 0.3s cubic-bezier(0.83, 0, 0.17, 1);
 }
 
 .dot-separator {
@@ -1203,10 +1220,10 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    translate: -50% -50%;
     width: 60vw;
     height: 60vh;
-    opacity: 0.10;
+    opacity: 0.15;
     pointer-events: none;
     z-index: 0;
 }
@@ -1217,7 +1234,7 @@ body {
     fill: none;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    transition: stroke-dashoffset 2.5s cubic-bezier(0.83, 0, 0.17, 1);
+    transition: stroke-dashoffset 3s cubic-bezier(0.83, 0, 0.17, 1);
 }
 
 .is-visible .botanical-monolith path {
