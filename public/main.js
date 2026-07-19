@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    document.querySelectorAll('.grid-container, .grid-footer-container').forEach(container => {
+    document.querySelectorAll('.grid-container, .grid-footer-container, .monolith-container').forEach(container => {
         sectionObserver.observe(container);
     });
 
