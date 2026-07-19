@@ -1,5 +1,4 @@
 {
   "installCommand": "",
-  "buildCommand": "",
-  "outputDirectory": "public"
+  "buildCommand": "mkdir -p .vercel/output/static && cp -r public/* .vercel/output/static/ && echo '{\"version\":3}' > .vercel/output/config.json"
 }
