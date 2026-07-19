@@ -15,6 +15,13 @@
 
 html {
     scroll-behavior: smooth;
+    zoom: 1.25;
+}
+
+@media (max-width: 768px) {
+    html {
+        zoom: 1;
+    }
 }
 
 body {
