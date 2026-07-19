@@ -15,13 +15,13 @@
 
 html {
     scroll-behavior: smooth;
-    zoom: 1.25;
     scroll-snap-type: y mandatory;
+    overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     html {
-        zoom: 1;
+        zoom: 1.25;
     }
 }
 
@@ -29,7 +29,6 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-family);
-    overflow-x: hidden;
     line-height: 1.5;
 }
 
