@@ -16,6 +16,7 @@
 html {
     scroll-behavior: smooth;
     zoom: 1.25;
+    scroll-snap-type: y mandatory;
 }
 
 @media (max-width: 768px) {
@@ -119,7 +120,7 @@ body {
 
 /* Structural Pin Mechanics */
 .sticky-hero {
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 1;
 }
@@ -127,7 +128,6 @@ body {
 .scrolling-overlay {
     position: relative;
     z-index: 2;
-    /* Sections inside will slide over the sticky hero */
 }
 
 /* Typography */
@@ -165,6 +165,9 @@ body {
     position: relative;
     padding: 6rem 1.5rem;
     overflow: hidden;
+    min-height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .viewport-height {
@@ -1090,6 +1093,7 @@ body {
 /* Footer Grid */
 .grid-footer-container {
     padding: 0;
+    scroll-snap-align: start;
 }
 
 .footer-grid {
