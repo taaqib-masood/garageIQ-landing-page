@@ -211,9 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- UAE shape from real SVG paths (viewBox: 0 0 760 613) ---
         const svgW = 760, svgH = 613;
-        const scaleRatio = Math.min(700 / svgW, 450 / svgH);
-        const offsetX = ((800 - svgW * scaleRatio) / 2) - 60; // Shift map explicitly left
-        const offsetY = (500 - svgH * scaleRatio) / 2;
+        const isMobileMap = window.innerWidth <= 768;
+        const scaleMult = isMobileMap ? 0.7 : 1.0;
+        const scaleRatio = Math.min(700 / svgW, 450 / svgH) * scaleMult;
+        const offsetX = ((800 - svgW * scaleRatio) / 2) - (isMobileMap ? -10 : 60); 
+        const offsetY = ((500 - svgH * scaleRatio) / 2) - (isMobileMap ? 30 : 0);
 
         const hiddenCanvas = document.createElement('canvas');
         hiddenCanvas.width = 800;

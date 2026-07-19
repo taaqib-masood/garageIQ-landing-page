@@ -792,6 +792,12 @@ body {
     transition: opacity 0.3s var(--ease-brutal), text-shadow 0.3s var(--ease-brutal);
 }
 
+@media (max-width: 768px) {
+    .canvas-label {
+        display: none;
+    }
+}
+
 .canvas-label.is-active {
     opacity: 1;
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
