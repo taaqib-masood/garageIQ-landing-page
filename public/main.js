@@ -86,6 +86,32 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(container);
     });
 
+    // 4.2 Dynamic Image Switcher
+    const switchers = document.querySelectorAll('.image-switcher');
+    const switcherObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const slides = entry.target.querySelectorAll('.mockup-slide');
+                if (slides.length <= 1) return;
+                
+                let activeIndex = -1;
+                slides.forEach((slide, index) => {
+                    if (slide.classList.contains('active')) activeIndex = index;
+                });
+                
+                if (activeIndex !== -1) {
+                    slides[activeIndex].classList.remove('active');
+                    const nextIndex = (activeIndex + 1) % slides.length;
+                    slides[nextIndex].classList.add('active');
+                } else {
+                    slides[0].classList.add('active');
+                }
+            }
+        });
+    }, { root: null, rootMargin: '0px', threshold: 0.5 });
+    
+    switchers.forEach(s => switcherObserver.observe(s));
+
     // 4.5. FAQ Accordion Logic
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(q => {
