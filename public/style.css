@@ -283,14 +283,14 @@ body {
 }
 
 .window-wipe-reveal {
-    clip-path: inset(100% 0% 0% 0%);
+    clip-path: inset(100% -50% -50% -50%);
     transform: scale(1.2);
     transition: clip-path 1.2s var(--ease-brutal), transform 1.2s var(--ease-brutal);
     transition-delay: 0.2s;
 }
 
 .grid-container.is-visible .window-wipe-reveal {
-    clip-path: inset(0% 0% 0% 0%);
+    clip-path: inset(-50% -50% -50% -50%);
     transform: scale(1);
 }
 
