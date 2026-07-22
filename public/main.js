@@ -99,8 +99,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (slide.classList.contains('active')) activeIndex = index;
                 });
                 
+                slides.forEach(slide => slide.classList.remove('prev'));
+                
                 if (activeIndex !== -1) {
                     slides[activeIndex].classList.remove('active');
+                    slides[activeIndex].classList.add('prev');
                     const nextIndex = (activeIndex + 1) % slides.length;
                     slides[nextIndex].classList.add('active');
                 } else {
