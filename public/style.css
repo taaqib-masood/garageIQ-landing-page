@@ -457,8 +457,7 @@ body {
         inset 0 0 0 1px rgba(255, 255, 255, 0.05), /* Subtle inner edge */
         0 0 0 3px #1a1a1a,                         /* Outer casing */
         0 0 0 6px #050505,                         /* Deep outer edge */
-        10px 24px 60px rgba(0, 0, 0, 0.8),         /* Primary 3D drop shadow */
-        -10px -10px 40px rgba(255, 255, 255, 0.02);/* Soft ambient rim light */
+        10px 24px 60px rgba(0, 0, 0, 0.8);         /* Primary 3D drop shadow */
 }
 
 /* Dynamic Island */
