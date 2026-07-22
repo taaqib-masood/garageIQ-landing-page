@@ -134,9 +134,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }, { root: null, rootMargin: '0px', threshold: 0.3 });
+    switchers.forEach(s => {
+        switcherObserver.observe(s);
+        
+        // Manual interactions (tap/swipe)
+        const triggerNextSlide = () => {
+            cycleSlide(s);
+            // Reset interval to prevent double-cycling immediately
+            if (switcherIntervals.has(s)) {
+                clearInterval(switcherIntervals.get(s));
+                switcherIntervals.set(s, setInterval(() => cycleSlide(s), 3000));
+            }
+        };
 
-    switchers.forEach(s => switcherObserver.observe(s));
+        // Click to advance
+        s.style.cursor = 'pointer';
+        s.addEventListener('click', triggerNextSlide);
 
+        // Swipe to advance
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        s.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+        
+        s.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            // If swipe distance is significant enough in any direction
+            if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+                triggerNextSlide();
+            }
+        }, {passive: true});
+    });
     // 4.5. FAQ Accordion Logic
     const faqQuestions = document.querySelectorAll('.faq-question');
     faqQuestions.forEach(q => {
