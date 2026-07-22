@@ -86,33 +86,55 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(container);
     });
 
-    // 4.2 Dynamic Image Switcher
+    // 4.2 Dynamic Image Switcher — Auto-cycle while visible
     const switchers = document.querySelectorAll('.image-switcher');
+    const switcherIntervals = new Map();
+
+    const cycleSlide = (container) => {
+        const slides = container.querySelectorAll('.mockup-slide');
+        const dots = container.querySelectorAll('.iphone-dots .dot');
+        if (slides.length <= 1) return;
+
+        let activeIndex = -1;
+        slides.forEach((slide, i) => {
+            if (slide.classList.contains('active')) activeIndex = i;
+        });
+
+        // Clear all prev states
+        slides.forEach(s => s.classList.remove('prev'));
+
+        if (activeIndex !== -1) {
+            slides[activeIndex].classList.remove('active');
+            slides[activeIndex].classList.add('prev');
+            if (dots.length) dots[activeIndex].classList.remove('active');
+
+            const nextIndex = (activeIndex + 1) % slides.length;
+            slides[nextIndex].classList.add('active');
+            if (dots.length) dots[nextIndex].classList.add('active');
+        } else {
+            slides[0].classList.add('active');
+            if (dots.length) dots[0].classList.add('active');
+        }
+    };
+
     const switcherObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const slides = entry.target.querySelectorAll('.mockup-slide');
-                if (slides.length <= 1) return;
-                
-                let activeIndex = -1;
-                slides.forEach((slide, index) => {
-                    if (slide.classList.contains('active')) activeIndex = index;
-                });
-                
-                slides.forEach(slide => slide.classList.remove('prev'));
-                
-                if (activeIndex !== -1) {
-                    slides[activeIndex].classList.remove('active');
-                    slides[activeIndex].classList.add('prev');
-                    const nextIndex = (activeIndex + 1) % slides.length;
-                    slides[nextIndex].classList.add('active');
-                } else {
-                    slides[0].classList.add('active');
+                // Start auto-cycling every 3s
+                if (!switcherIntervals.has(entry.target)) {
+                    const interval = setInterval(() => cycleSlide(entry.target), 3000);
+                    switcherIntervals.set(entry.target, interval);
+                }
+            } else {
+                // Pause when out of view
+                if (switcherIntervals.has(entry.target)) {
+                    clearInterval(switcherIntervals.get(entry.target));
+                    switcherIntervals.delete(entry.target);
                 }
             }
         });
-    }, { root: null, rootMargin: '0px', threshold: 0.5 });
-    
+    }, { root: null, rootMargin: '0px', threshold: 0.3 });
+
     switchers.forEach(s => switcherObserver.observe(s));
 
     // 4.5. FAQ Accordion Logic

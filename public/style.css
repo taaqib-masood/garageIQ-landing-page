@@ -443,31 +443,142 @@ body {
     .split-layout.reverse { flex-direction: row-reverse; }
 }
 
-/* App Mockup UI */
-.phone-mockup {
-    width: 320px;
-    height: 500px;
-    border: 4px solid var(--text-color);
-    border-radius: 40px;
-    background: #0A0A0A;
+/* ── iPhone 15 Pro Mockup ── */
+.iphone-frame {
+    width: 280px;
+    height: 572px;
+    border-radius: 48px;
+    background: #1a1a1a;
     margin: 0 auto;
     position: relative;
-    box-shadow: inset 0 0 0 4px #0A0A0A, inset 0 0 0 6px var(--text-color);
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
+    padding: 12px;
+    box-shadow:
+        inset 0 0 0 2px #333,
+        0 0 0 2px #0A0A0A,
+        0 0 0 4px #2a2a2a,
+        0 20px 60px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.05);
 }
 
-.phone-screen {
-    flex: 1;
+/* Dynamic Island */
+.iphone-notch {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.notch-cam {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #1a2a44 0%, #0d1520 60%, #000 100%);
+    box-shadow: inset 0 0 2px rgba(0,100,200,0.3);
+}
+
+/* Hardware Buttons */
+.iphone-btn {
+    position: absolute;
+    background: #2a2a2a;
+    border-radius: 2px;
+}
+
+.iphone-btn-power {
+    right: -3px;
+    top: 140px;
+    width: 3px;
+    height: 64px;
+    border-radius: 0 2px 2px 0;
+}
+
+.iphone-btn-vol-up {
+    left: -3px;
+    top: 120px;
+    width: 3px;
+    height: 40px;
+    border-radius: 2px 0 0 2px;
+}
+
+.iphone-btn-vol-down {
+    left: -3px;
+    top: 170px;
+    width: 3px;
+    height: 40px;
+    border-radius: 2px 0 0 2px;
+}
+
+.iphone-btn-silent {
+    left: -3px;
+    top: 80px;
+    width: 3px;
+    height: 24px;
+    border-radius: 2px 0 0 2px;
+}
+
+/* Screen */
+.iphone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 38px;
+    overflow: hidden;
     position: relative;
-    border-radius: 24px;
-    border: 1px solid var(--border-color);
-    padding: 1.5rem 1rem;
-    display: flex;
-    flex-direction: column;
+    background: #000;
 }
 
+/* Glass Glare */
+.iphone-glare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 48px;
+    background: linear-gradient(
+        115deg,
+        rgba(255,255,255,0.12) 0%,
+        rgba(255,255,255,0.04) 25%,
+        transparent 50%
+    );
+    pointer-events: none;
+    z-index: 8;
+}
+
+/* Progress Dots */
+.iphone-dots {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+}
+
+.iphone-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-color);
+    opacity: 0.2;
+    transition: opacity 0.3s cubic-bezier(0.83, 0, 0.17, 1),
+                transform 0.3s cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+.iphone-dots .dot.active {
+    opacity: 1;
+    transform: scale(1.4);
+}
+
+/* Slide Animations */
 .mockup-slide {
     position: absolute;
     top: 0;
@@ -476,22 +587,23 @@ body {
     height: 100%;
     object-fit: cover;
     object-position: top center;
-    border-radius: 24px;
+    border-radius: 38px;
     opacity: 0;
-    transform: translateY(100%);
+    transform: scale(1.04);
     z-index: 1;
-    transition: transform 0.6s cubic-bezier(0.83, 0, 0.17, 1), opacity 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+    transition: opacity 0.7s cubic-bezier(0.83, 0, 0.17, 1),
+                transform 0.7s cubic-bezier(0.83, 0, 0.17, 1);
 }
 
 .mockup-slide.prev {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 0;
+    transform: scale(0.96);
     z-index: 1;
 }
 
 .mockup-slide.active {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
     z-index: 2;
 }
 
