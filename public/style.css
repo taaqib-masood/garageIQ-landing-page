@@ -443,113 +443,29 @@ body {
     .split-layout.reverse { flex-direction: row-reverse; }
 }
 
-/* ── iPhone 15 Pro Mockup ── */
+/* ── Sleek Phone Mockup ── */
 .iphone-frame {
     width: 280px;
     height: 572px;
-    border-radius: 48px;
-    background: #1a1a1a;
+    border-radius: 40px;
+    background: #0A0A0A;
     margin: 0 auto;
     position: relative;
-    padding: 12px;
+    padding: 8px;
     box-shadow:
-        inset 0 0 0 2px #333,
-        0 0 0 2px #0A0A0A,
-        0 0 0 4px #2a2a2a,
-        0 20px 60px rgba(0,0,0,0.5),
-        0 0 0 1px rgba(255,255,255,0.05);
-}
-
-/* Dynamic Island */
-.iphone-notch {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    height: 28px;
-    background: #000;
-    border-radius: 20px;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 10px;
-}
-
-.notch-cam {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #1a2a44 0%, #0d1520 60%, #000 100%);
-    box-shadow: inset 0 0 2px rgba(0,100,200,0.3);
-}
-
-/* Hardware Buttons */
-.iphone-btn {
-    position: absolute;
-    background: #2a2a2a;
-    border-radius: 2px;
-}
-
-.iphone-btn-power {
-    right: -3px;
-    top: 140px;
-    width: 3px;
-    height: 64px;
-    border-radius: 0 2px 2px 0;
-}
-
-.iphone-btn-vol-up {
-    left: -3px;
-    top: 120px;
-    width: 3px;
-    height: 40px;
-    border-radius: 2px 0 0 2px;
-}
-
-.iphone-btn-vol-down {
-    left: -3px;
-    top: 170px;
-    width: 3px;
-    height: 40px;
-    border-radius: 2px 0 0 2px;
-}
-
-.iphone-btn-silent {
-    left: -3px;
-    top: 80px;
-    width: 3px;
-    height: 24px;
-    border-radius: 2px 0 0 2px;
+        0 0 0 1px #333,
+        0 20px 60px rgba(0,0,0,0.5);
 }
 
 /* Screen */
 .iphone-screen {
     width: 100%;
     height: 100%;
-    border-radius: 38px;
+    border-radius: 32px;
     overflow: hidden;
     position: relative;
     background: #000;
-}
-
-/* Glass Glare */
-.iphone-glare {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 48px;
-    background: linear-gradient(
-        115deg,
-        rgba(255,255,255,0.12) 0%,
-        rgba(255,255,255,0.04) 25%,
-        transparent 50%
-    );
-    pointer-events: none;
-    z-index: 8;
+    border: 1px solid #1a1a1a;
 }
 
 /* Progress Dots */
