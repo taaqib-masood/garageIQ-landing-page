@@ -443,18 +443,22 @@ body {
     .split-layout.reverse { flex-direction: row-reverse; }
 }
 
-/* ── Sleek Phone Mockup ── */
+/* ── 3D Premium Phone Mockup ── */
 .iphone-frame {
     width: 280px;
     height: 572px;
-    border-radius: 40px;
-    background: #0A0A0A;
+    border-radius: 44px;
+    background: #0d0d0d;
     margin: 0 auto;
     position: relative;
-    padding: 8px;
+    padding: 10px;
     box-shadow:
-        0 0 0 1px #333,
-        0 20px 60px rgba(0,0,0,0.5);
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),  /* Top rim highlight */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05), /* Subtle inner edge */
+        0 0 0 3px #1a1a1a,                         /* Outer casing */
+        0 0 0 6px #050505,                         /* Deep outer edge */
+        10px 24px 60px rgba(0, 0, 0, 0.8),         /* Primary 3D drop shadow */
+        -10px -10px 40px rgba(255, 255, 255, 0.02);/* Soft ambient rim light */
 }
 
 /* Screen */
