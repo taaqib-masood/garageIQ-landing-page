@@ -15,7 +15,6 @@
 
 html {
     scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
     overflow-x: hidden;
 }
 
@@ -163,8 +162,6 @@ body {
     padding: 6rem 1.5rem;
     overflow: hidden;
     min-height: 100vh;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
 }
 
 .viewport-height {
