@@ -180,11 +180,18 @@ body {
 .pt-0 { padding-top: 0 !important; }
 /* Grid System & Lines */
 .grid-container {
+    width: 100%;
+    position: relative;
+}
+
+.content {
     max-width: 1200px;
     margin: 0 auto;
-    position: relative;
+    width: 100%;
     padding-left: 2rem;
     padding-right: 2rem;
+    position: relative;
+    z-index: 2;
 }
 
 .grid-line {
@@ -195,10 +202,11 @@ body {
     background-color: var(--border-color);
     transform-origin: top;
     transform: scaleY(0);
+    z-index: 1;
 }
 
-.grid-line.left-line { left: 0; }
-.grid-line.right-line { right: 0; }
+.grid-line.left-line { left: max(0px, calc(50vw - 600px)); }
+.grid-line.right-line { right: max(0px, calc(50vw - 600px)); }
 
 .grid-container.is-visible .grid-line {
     transform: scaleY(1);
@@ -365,7 +373,7 @@ body {
 .parallax-numeral {
     position: absolute;
     top: 0;
-    left: -2%;
+    left: max(-2%, calc(50vw - 620px));
     font-size: clamp(15rem, 30vw, 300px);
     font-weight: 800;
     color: #F0F0F0;
