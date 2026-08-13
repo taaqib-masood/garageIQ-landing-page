@@ -272,9 +272,17 @@ document.addEventListener('DOMContentLoaded', () => {
         window.requestAnimationFrame(step);
     }
 
+    // Live-verified against the GarageIQ DB on 2026-08-13 (docs/36 §1.1):
+    //   8,083   = garages a user can actually find (is_active), not 8,374 total
+    //   505,453 = review rows carrying real written text, of 538,745 stored
+    //
+    // Previously 8,396 and 55,214. The review figure was wrong by a factor of
+    // ten and undersold the single most impressive asset in the product. These
+    // counters are animated in JS, so editing index.html alone leaves the page
+    // still rendering the old numbers — change them here.
     setTimeout(() => {
-        if(garageCountEl) animateValue(garageCountEl, 0, 8396, 2000);
-        if(reviewCountEl) animateValue(reviewCountEl, 0, 55214, 2500);
+        if(garageCountEl) animateValue(garageCountEl, 0, 8083, 2000);
+        if(reviewCountEl) animateValue(reviewCountEl, 0, 505453, 2500);
     }, 800);
 
     // 8. Fixed-Perspective Neural Pulse — 3D network inside UAE silhouette
