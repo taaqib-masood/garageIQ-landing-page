@@ -2,29 +2,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 0. The "Ink Ring" Custom Cursor
     const cursor = document.getElementById('brutalist-cursor');
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
-    
-    if (cursor) {
-        if (isTouch) {
-            cursor.style.display = 'none';
-        } else {
-            // Track mouse position globally
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.transform = `translate(calc(${e.clientX}px - 50%), calc(${e.clientY}px - 50%))`;
-            });
+    const cursorMediaQuery = window.matchMedia('(any-hover: hover) and (any-pointer: fine)');
 
-        // Hover states for CTAs
-        document.querySelectorAll('.interactive-cta').forEach(el => {
+    if (cursor) {
+        const root = document.documentElement;
+        const nativeCursorSelector = 'textarea, select, [contenteditable="true"]';
+        let cursorFrame = null;
+        let cursorX = 0;
+        let cursorY = 0;
+        let pageZoom = 1;
+
+        const resetCursorState = () => {
+            cursor.classList.remove('is-visible', 'cta-hover', 'text-hover', 'input-hover');
+        };
+
+        const syncCursorCapability = () => {
+            if (!cursorMediaQuery.matches) {
+                root.classList.remove('custom-cursor-enabled');
+            }
+            resetCursorState();
+        };
+
+        const syncPageZoom = () => {
+            pageZoom = parseFloat(window.getComputedStyle(root).zoom) || 1;
+        };
+
+        const renderCursor = () => {
+            // Root-level CSS zoom scales transforms as well as layout. Convert
+            // viewport coordinates back into the cursor's local coordinate space.
+            cursor.style.transform = `translate(calc(${cursorX / pageZoom}px - 50%), calc(${cursorY / pageZoom}px - 50%))`;
+            cursorFrame = null;
+        };
+
+        document.addEventListener('pointermove', (event) => {
+            if (!cursorMediaQuery.matches || event.pointerType !== 'mouse') return;
+
+            if (event.target instanceof Element && event.target.closest(nativeCursorSelector)) {
+                cursor.classList.remove('is-visible');
+                return;
+            }
+
+            // Wait for a real mouse event before replacing the native cursor.
+            root.classList.add('custom-cursor-enabled');
+            cursorX = event.clientX;
+            cursorY = event.clientY;
+            cursor.classList.add('is-visible');
+
+            if (cursorFrame === null) {
+                cursorFrame = window.requestAnimationFrame(renderCursor);
+            }
+        }, { passive: true });
+
+        // Hide the ring when the pointer or page is no longer active.
+        document.addEventListener('mouseleave', resetCursorState);
+        window.addEventListener('mouseout', (event) => {
+            if (!event.relatedTarget) resetCursorState();
+        });
+        window.addEventListener('blur', resetCursorState);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) resetCursorState();
+        });
+
+        // Large cursor states are reserved for controls users can activate.
+        document.querySelectorAll('a[href]:not(.interactive-text), button:not(:disabled), [role="button"]').forEach(el => {
             el.addEventListener('mouseenter', () => cursor.classList.add('cta-hover'));
             el.addEventListener('mouseleave', () => cursor.classList.remove('cta-hover'));
         });
 
-            // Hover states for text/links
-            document.querySelectorAll('.interactive-text, h1, h2, h3, p').forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('text-hover'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('text-hover'));
-            });
-        }
+        // A small cursor state remains available for deliberately subtle links.
+        document.querySelectorAll('a.interactive-text[href]').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('text-hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('text-hover'));
+        });
+
+        // Use an animated I-beam over text fields without sacrificing precision.
+        document.querySelectorAll('input:not([type="button"]):not([type="submit"]):not([type="reset"])').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('input-hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('input-hover'));
+        });
+
+        cursorMediaQuery.addEventListener('change', syncCursorCapability);
+        window.addEventListener('resize', syncPageZoom, { passive: true });
+        syncPageZoom();
+        syncCursorCapability();
     }
 
     // 1. Scroll-Progress Hairline
@@ -86,91 +146,114 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(container);
     });
 
-    // 4.2 Dynamic Image Switcher — Auto-cycle while visible
+    // 4.2 App screenshot carousel — buttons, dots, swipe, and visible-only autoplay
     const switchers = document.querySelectorAll('.image-switcher');
     const switcherIntervals = new Map();
+    const reduceCarouselMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const cycleSlide = (container) => {
-        const slides = container.querySelectorAll('.mockup-slide');
-        const dots = container.querySelectorAll('.iphone-dots .dot');
-        if (slides.length <= 1) return;
+    const getActiveSlideIndex = (container) => {
+        const slides = Array.from(container.querySelectorAll('.mockup-slide'));
+        const activeIndex = slides.findIndex(slide => slide.classList.contains('active'));
+        return activeIndex < 0 ? 0 : activeIndex;
+    };
 
-        let activeIndex = -1;
-        slides.forEach((slide, i) => {
-            if (slide.classList.contains('active')) activeIndex = i;
+    const showSlide = (container, requestedIndex) => {
+        const slides = Array.from(container.querySelectorAll('.mockup-slide'));
+        const dots = Array.from(container.querySelectorAll('.iphone-dots .dot'));
+        if (!slides.length) return;
+
+        const currentIndex = getActiveSlideIndex(container);
+        const nextIndex = (requestedIndex + slides.length) % slides.length;
+
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active', 'prev');
+            slide.setAttribute('aria-hidden', index === nextIndex ? 'false' : 'true');
         });
 
-        // Clear all prev states
-        slides.forEach(s => s.classList.remove('prev'));
+        if (currentIndex !== nextIndex) slides[currentIndex].classList.add('prev');
+        slides[nextIndex].classList.add('active');
 
-        if (activeIndex !== -1) {
-            slides[activeIndex].classList.remove('active');
-            slides[activeIndex].classList.add('prev');
-            if (dots.length) dots[activeIndex].classList.remove('active');
+        dots.forEach((dot, index) => {
+            const isActive = index === nextIndex;
+            dot.classList.toggle('active', isActive);
+            dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+        });
 
-            const nextIndex = (activeIndex + 1) % slides.length;
-            slides[nextIndex].classList.add('active');
-            if (dots.length) dots[nextIndex].classList.add('active');
-        } else {
-            slides[0].classList.add('active');
-            if (dots.length) dots[0].classList.add('active');
-        }
+        const label = container.querySelector('.current-screen-label');
+        const count = container.querySelector('.current-screen-count');
+        if (label) label.textContent = slides[nextIndex].dataset.label || `Screen ${nextIndex + 1}`;
+        if (count) count.textContent = `${nextIndex + 1} of ${slides.length}`;
+    };
+
+    const stopCarousel = (container) => {
+        if (!switcherIntervals.has(container)) return;
+        clearInterval(switcherIntervals.get(container));
+        switcherIntervals.delete(container);
+    };
+
+    const startCarousel = (container) => {
+        if (reduceCarouselMotion || switcherIntervals.has(container)) return;
+        switcherIntervals.set(container, setInterval(() => {
+            showSlide(container, getActiveSlideIndex(container) + 1);
+        }, 5000));
+    };
+
+    const restartCarousel = (container) => {
+        const wasRunning = switcherIntervals.has(container);
+        stopCarousel(container);
+        if (wasRunning) startCarousel(container);
     };
 
     const switcherObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Start auto-cycling every 3s
-                if (!switcherIntervals.has(entry.target)) {
-                    const interval = setInterval(() => cycleSlide(entry.target), 3000);
-                    switcherIntervals.set(entry.target, interval);
-                }
-            } else {
-                // Pause when out of view
-                if (switcherIntervals.has(entry.target)) {
-                    clearInterval(switcherIntervals.get(entry.target));
-                    switcherIntervals.delete(entry.target);
-                }
-            }
+            if (entry.isIntersecting) startCarousel(entry.target);
+            else stopCarousel(entry.target);
         });
     }, { root: null, rootMargin: '0px', threshold: 0.3 });
-    switchers.forEach(s => {
-        switcherObserver.observe(s);
-        
-        // Manual interactions (tap/swipe)
-        const triggerNextSlide = () => {
-            cycleSlide(s);
-            // Reset interval to prevent double-cycling immediately
-            if (switcherIntervals.has(s)) {
-                clearInterval(switcherIntervals.get(s));
-                switcherIntervals.set(s, setInterval(() => cycleSlide(s), 3000));
-            }
-        };
 
-        // Click to advance
-        s.style.cursor = 'pointer';
-        s.addEventListener('click', triggerNextSlide);
+    switchers.forEach(container => {
+        switcherObserver.observe(container);
 
-        // Swipe to advance
+        container.querySelector('.carousel-prev')?.addEventListener('click', () => {
+            showSlide(container, getActiveSlideIndex(container) - 1);
+            restartCarousel(container);
+        });
+
+        container.querySelector('.carousel-next')?.addEventListener('click', () => {
+            showSlide(container, getActiveSlideIndex(container) + 1);
+            restartCarousel(container);
+        });
+
+        container.querySelectorAll('.iphone-dots .dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                showSlide(container, Number(dot.dataset.slide));
+                restartCarousel(container);
+            });
+        });
+
         let touchStartX = 0;
         let touchStartY = 0;
-        
-        s.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, {passive: true});
-        
-        s.addEventListener('touchend', e => {
-            const touchEndX = e.changedTouches[0].screenX;
-            const touchEndY = e.changedTouches[0].screenY;
-            const dx = touchEndX - touchStartX;
-            const dy = touchEndY - touchStartY;
-            
-            // If swipe distance is significant enough in any direction
-            if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
-                triggerNextSlide();
-            }
-        }, {passive: true});
+
+        container.addEventListener('touchstart', event => {
+            touchStartX = event.changedTouches[0].clientX;
+            touchStartY = event.changedTouches[0].clientY;
+        }, { passive: true });
+
+        container.addEventListener('touchend', event => {
+            const dx = event.changedTouches[0].clientX - touchStartX;
+            const dy = event.changedTouches[0].clientY - touchStartY;
+            if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+
+            showSlide(container, getActiveSlideIndex(container) + (dx < 0 ? 1 : -1));
+            restartCarousel(container);
+        }, { passive: true });
+
+        container.addEventListener('mouseenter', () => stopCarousel(container));
+        container.addEventListener('mouseleave', () => startCarousel(container));
+        container.addEventListener('focusin', () => stopCarousel(container));
+        container.addEventListener('focusout', event => {
+            if (!container.contains(event.relatedTarget)) startCarousel(container);
+        });
     });
     // 4.5. FAQ Accordion Logic
     const faqQuestions = document.querySelectorAll('.faq-question');
@@ -273,8 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setTimeout(() => {
-        if(garageCountEl) animateValue(garageCountEl, 0, 8396, 2000);
-        if(reviewCountEl) animateValue(reviewCountEl, 0, 55214, 2500);
+        if(garageCountEl) animateValue(garageCountEl, 0, 8063, 2000);
+        if(reviewCountEl) animateValue(reviewCountEl, 0, 957021, 2500);
     }, 800);
 
     // 8. Fixed-Perspective Neural Pulse — 3D network inside UAE silhouette
@@ -286,40 +369,75 @@ document.addEventListener('DOMContentLoaded', () => {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 1, 1, 1000);
+        // Mobile needs a long camera distance to fit the wide UAE silhouette.
+        // Keep the far plane beyond that distance so the map is not clipped away.
+        const camera = new THREE.PerspectiveCamera(45, 1, 1, 5000);
+
+        const group = new THREE.Group();
+        // Fixed 15-degree tilt for depth perception, never changes
+        group.rotation.x = -0.12;
+        scene.add(group);
+
+        const canvasLabels = document.querySelectorAll('.canvas-label');
+        const labelAnchors = Array.from(canvasLabels).map(label => ({
+            label,
+            point: new THREE.Vector3(
+                parseFloat(label.dataset.mapX),
+                parseFloat(label.dataset.mapY),
+                2
+            )
+        }));
         
         // Define virtual coordinate system for the map (always 800x500)
         const VIRTUAL_W = 800;
         const VIRTUAL_H = 500;
+        let mapBounds = null;
         
         function updateMapLayout() {
             const width = container.clientWidth || window.innerWidth;
             const height = container.clientHeight || 500;
-            const isMobile = window.innerWidth <= 768;
+            const isMobile = window.innerWidth < 768;
             
             renderer.setSize(width, height);
             
             const aspect = width / height;
             camera.aspect = aspect;
             
-            // If mobile, pull camera way back so the wide map fits. If desktop, pull back slightly if narrow.
-            if (isMobile) {
-                camera.position.set(0, 80, 580 * (1.8 / aspect));
+            // On mobile, fit the actual UAE silhouette instead of the larger virtual
+            // canvas around it. This keeps the map readable without cropping it.
+            if (isMobile && mapBounds) {
+                const centerX = (mapBounds.minX + mapBounds.maxX) / 2;
+                const centerY = (mapBounds.minY + mapBounds.maxY) / 2;
+                const mapWidth = mapBounds.maxX - mapBounds.minX;
+                const mapHeight = mapBounds.maxY - mapBounds.minY;
+                const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+                const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * aspect);
+                const heightDistance = (mapHeight / 2) / Math.tan(verticalFov / 2);
+                const widthDistance = (mapWidth / 2) / Math.tan(horizontalFov / 2);
+                // Leave a little horizontal room for the labels that sit beside
+                // the small northern emirates.
+                const distance = Math.max(heightDistance, widthDistance) * 1.18;
+
+                camera.position.set(centerX, centerY + 50, distance);
+                camera.lookAt(centerX, centerY, 0);
             } else {
                 camera.position.set(0, 80, aspect < 1.6 ? 580 * (1.6 / aspect) : 580);
+                camera.lookAt(0, 0, 0);
             }
-            camera.lookAt(0, 0, 0);
             camera.updateProjectionMatrix();
+            camera.updateMatrixWorld(true);
+            group.updateMatrixWorld(true);
+
+            labelAnchors.forEach(({ label, point }) => {
+                const projected = point.clone()
+                    .applyMatrix4(group.matrixWorld)
+                    .project(camera);
+                label.style.left = `${(projected.x * 0.5 + 0.5) * 100}%`;
+                label.style.top = `${(-projected.y * 0.5 + 0.5) * 100}%`;
+            });
         }
         
-        // Initial layout
-        updateMapLayout();
         window.addEventListener('resize', updateMapLayout);
-
-        const group = new THREE.Group();
-        // Fixed 15-degree tilt for depth perception, never changes
-        group.rotation.x = -0.12;
-        scene.add(group);
 
         function monolithEase(t) {
             if (t <= 0) return 0;
@@ -351,6 +469,76 @@ document.addEventListener('DOMContentLoaded', () => {
             transformed.addPath(new Path2D(pathStr), matrix);
             emiratePaths.push(transformed);
         });
+
+        // Find a real geographic anchor inside every emirate path. The SVG paths
+        // can be irregular or split into multiple pieces, so use their visual
+        // centroid and snap it back to the nearest point that is actually inside.
+        function getPathMetrics(path) {
+            const samples = [];
+            let minX = VIRTUAL_W;
+            let minY = VIRTUAL_H;
+            let maxX = 0;
+            let maxY = 0;
+            let sumX = 0;
+            let sumY = 0;
+
+            for (let y = 1; y < VIRTUAL_H; y += 2) {
+                for (let x = 1; x < VIRTUAL_W; x += 2) {
+                    if (!hCtx.isPointInPath(path, x, y)) continue;
+                    samples.push({ x, y });
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                    sumX += x;
+                    sumY += y;
+                }
+            }
+
+            if (samples.length === 0) return null;
+
+            const centroidX = sumX / samples.length;
+            const centroidY = sumY / samples.length;
+            let anchor = samples[0];
+            let nearestDistance = Infinity;
+
+            samples.forEach(sample => {
+                const distance = Math.hypot(sample.x - centroidX, sample.y - centroidY);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    anchor = sample;
+                }
+            });
+
+            return { minX, minY, maxX, maxY, anchor };
+        }
+
+        const pathMetrics = emiratePaths.map(getPathMetrics);
+        const validMetrics = pathMetrics.filter(Boolean);
+
+        if (validMetrics.length) {
+            mapBounds = {
+                minX: Math.min(...validMetrics.map(metric => metric.minX)) - (VIRTUAL_W / 2),
+                maxX: Math.max(...validMetrics.map(metric => metric.maxX)) - (VIRTUAL_W / 2),
+                minY: (VIRTUAL_H / 2) - Math.max(...validMetrics.map(metric => metric.maxY)),
+                maxY: (VIRTUAL_H / 2) - Math.min(...validMetrics.map(metric => metric.minY))
+            };
+        }
+
+        labelAnchors.forEach(({ label, point }) => {
+            const pathIndex = parseInt(label.dataset.target, 10);
+            const metric = pathMetrics[pathIndex];
+            if (!metric) return;
+
+            const mapX = metric.anchor.x - (VIRTUAL_W / 2);
+            const mapY = (VIRTUAL_H / 2) - metric.anchor.y;
+            point.set(mapX, mapY, 2);
+            label.dataset.mapX = mapX.toFixed(1);
+            label.dataset.mapY = mapY.toFixed(1);
+        });
+
+        // The first layout now uses measured silhouette bounds and anchors.
+        updateMapLayout();
         
         hCtx.fillStyle = '#000';
         emiratePaths.forEach(p => { hCtx.fill(p); });
@@ -360,8 +548,8 @@ document.addEventListener('DOMContentLoaded', () => {
         outlineCanvas.width = 800;
         outlineCanvas.height = 500;
         const oCtx = outlineCanvas.getContext('2d');
-        oCtx.lineWidth = 1.5;
-        oCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        oCtx.lineWidth = 2;
+        oCtx.strokeStyle = 'rgba(255, 255, 255, 0.62)';
         oCtx.lineJoin = 'round';
         emiratePaths.forEach(p => { oCtx.stroke(p); });
 
@@ -410,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 glowUntil: 0     // timestamp when glow expires
                             });
                             positions.push(x, y, z);
-                            nodeAlphas.push(0.6); // default semi-transparent
+                            nodeAlphas.push(0.78); // default semi-transparent
                             nodeScales.push(0);   // starts at 0, scanner pops them
                         }
                     }
@@ -431,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 void main() {
                     vAlpha = aAlpha;
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                    gl_PointSize = 3.0 * aScale * (300.0 / -mvPosition.z);
+                    gl_PointSize = 4.5 * aScale * (300.0 / -mvPosition.z);
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
@@ -481,7 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const linesGeom = new THREE.BufferGeometry();
         linesGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-        const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15, depthWrite: false });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22, depthWrite: false });
         const lineMesh = new THREE.LineSegments(linesGeom, lineMat);
         group.add(lineMesh);
 
@@ -500,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 void main() {
                     vAlpha = aAlpha;
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                    gl_PointSize = 5.0 * (300.0 / -mvPosition.z);
+                    gl_PointSize = 7.0 * (300.0 / -mvPosition.z);
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
@@ -597,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alphasArr[idx] = 0.6 + 0.4 * glowFade;  // alpha up to 1.0
                     } else {
                         scalesArr[idx] = popProgress;
-                        alphasArr[idx] = 0.6;  // default semi-transparent
+                        alphasArr[idx] = 0.78;  // default semi-transparent
                     }
                 }
             });
@@ -681,7 +869,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let hoveredPathIndex = -1;
         const hudRows = document.querySelectorAll('.hud-row');
-        const canvasLabels = document.querySelectorAll('.canvas-label');
         hudRows.forEach((row) => {
             const pIdx = parseInt(row.getAttribute('data-emirate-idx'), 10);
             row.addEventListener('mouseenter', () => { 
@@ -764,18 +951,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { error } = await db.from('waitlist').insert([{ email }]);
                 
                 // Success Morph (Mechanical Slide-up)
+                waitlistForm.classList.add('is-success');
                 waitlistForm.innerHTML = `
-                    <div class="mechanical-reveal" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <div style="transform: translateY(100%); animation: slideUpBrutal 0.8s cubic-bezier(0.83, 0, 0.17, 1) forwards;">
+                    <div class="waitlist-success" role="status" aria-live="polite">
+                        <div class="waitlist-success-inner">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="margin: 0 auto 12px auto; display: block;">
                                 <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list.</h3>
+                            <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list!</h3>
                             <p class="waitlist-microcopy mt-2">We'll notify you at launch.</p>
                         </div>
                     </div>
                 `;
             });
         }
+    }
+
+    // 10. Embedded Terms of Use dialog
+    const termsDialog = document.getElementById('terms-of-use');
+    const termsOpenButton = document.querySelector('[data-open-terms]');
+    const termsCloseButton = document.querySelector('[data-close-terms]');
+
+    if (termsDialog && termsOpenButton && termsCloseButton) {
+        const closeTerms = () => {
+            if (termsDialog.open) termsDialog.close();
+        };
+
+        termsOpenButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            termsDialog.showModal();
+            document.documentElement.classList.add('legal-dialog-open');
+        });
+
+        termsCloseButton.addEventListener('click', closeTerms);
+        termsDialog.addEventListener('click', (event) => {
+            if (event.target === termsDialog) closeTerms();
+        });
+        termsDialog.addEventListener('close', () => {
+            document.documentElement.classList.remove('legal-dialog-open');
+        });
     }
 });
