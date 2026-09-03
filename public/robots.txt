@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://garage-iq-landing-page.vercel.app/sitemap.xml
+Sitemap: https://garageiq.ae/sitemap.xml
