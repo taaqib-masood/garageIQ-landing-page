@@ -4,12 +4,71 @@ document.addEventListener('DOMContentLoaded', () => {
     // Vercel Analytics was loaded but never called, so a waitlist that failed
     // on every submission looked identical to a page nobody scrolled to.
     // These events make the funnel visible: view -> focus -> submit -> result.
-    function trackEvent(name, data) {
+    //
+    // Events go to our own Postgres rather than Vercel Web Analytics, which is
+    // not enabled on this project and cannot be switched on through the API.
+    // Owning the data also means the funnel is a SQL query, not a dashboard.
+    // The window.va call is kept as a no-op-safe secondary sink in case Web
+    // Analytics is ever turned on.
+    //
+    // Deliberately no PII here: emails live in public.waitlist. These rows are
+    // anonymous steps stitched together by a per-tab session id.
+    const SUPABASE_URL = 'https://zbqtaiozkhfscwynddjd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXRhaW96a2hmc2N3eW5kZGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkzNjcsImV4cCI6MjA5NDI2NTM2N30.alfx8gruhDhJr1L_zwNt0xrzAaxJdkcgIFnyZdtofa0';
+
+    const sessionId = (() => {
         try {
-            window.va?.('event', { name, ...(data || {}) });
+            let id = sessionStorage.getItem('giq_sid');
+            if (!id) {
+                id = (crypto.randomUUID?.() || String(Date.now()) + Math.random()).slice(0, 64);
+                sessionStorage.setItem('giq_sid', id);
+            }
+            return id;
         } catch (_) {
-            /* analytics must never break the page */
+            return null;   // private mode, blocked storage
         }
+    })();
+
+    // Referrer host only — never the full URL, which can carry query strings.
+    const referrerHost = (() => {
+        try {
+            return document.referrer ? new URL(document.referrer).hostname.slice(0, 255) : null;
+        } catch (_) {
+            return null;
+        }
+    })();
+
+    function trackEvent(name, data) {
+        const payload = data || {};
+
+        // Secondary sink; silently does nothing while Web Analytics is off.
+        try {
+            window.va?.('event', { name, ...payload });
+        } catch (_) { /* analytics must never break the page */ }
+
+        // Primary sink. Fire-and-forget with keepalive so it still leaves the
+        // page if the visitor navigates away mid-request; never awaited, so it
+        // cannot slow down a form submission.
+        try {
+            const body = JSON.stringify({
+                name,
+                session_id: sessionId,
+                persona: payload.persona || null,
+                emirate: payload.emirate || null,
+                referrer: referrerHost
+            });
+            fetch(`${SUPABASE_URL}/rest/v1/landing_events`, {
+                method: 'POST',
+                keepalive: true,
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body
+            }).catch(() => { /* a dropped analytics beat is not worth a retry */ });
+        } catch (_) { /* never break the page for a metric */ }
     }
 
     // Query typed into the hero search, carried down to the waitlist submit.
@@ -996,8 +1055,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 9. Supabase Waitlist Integration
-    const supabaseUrl = 'https://zbqtaiozkhfscwynddjd.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXRhaW96a2hmc2N3eW5kZGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkzNjcsImV4cCI6MjA5NDI2NTM2N30.alfx8gruhDhJr1L_zwNt0xrzAaxJdkcgIFnyZdtofa0';
+    // Credentials are declared once at the top, alongside the funnel sink.
+    const supabaseUrl = SUPABASE_URL;
+    const supabaseAnonKey = SUPABASE_ANON_KEY;
     
     const waitlistForm = document.querySelector('.waitlist-form');
 
