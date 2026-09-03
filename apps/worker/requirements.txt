@@ -1,7 +1,0 @@
-celery
-redis
-pydantic
-groq
-psycopg-binary
-sqlalchemy
-python-dotenv
