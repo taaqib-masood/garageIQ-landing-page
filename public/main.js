@@ -1,5 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ── Conversion instrumentation ────────────────────────────────────────
+    // Vercel Analytics was loaded but never called, so a waitlist that failed
+    // on every submission looked identical to a page nobody scrolled to.
+    // These events make the funnel visible: view -> focus -> submit -> result.
+    function trackEvent(name, data) {
+        try {
+            window.va?.('event', { name, ...(data || {}) });
+        } catch (_) {
+            /* analytics must never break the page */
+        }
+    }
+
+    // Query typed into the hero search, carried down to the waitlist submit.
+    let pendingHeroQuery = '';
+
     // 0. The "Ink Ring" Custom Cursor
     const cursor = document.getElementById('brutalist-cursor');
     const cursorMediaQuery = window.matchMedia('(any-hover: hover) and (any-pointer: fine)');
@@ -146,91 +161,117 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(container);
     });
 
-    // 4.2 Dynamic Image Switcher — Auto-cycle while visible
+    // 4.2 Dynamic Image Switcher — Auto-cycle while visible.
+    //     The 3D chassis and dot styling are main's design and unchanged. What
+    //     is restored here is the control layer: the dots are real buttons, the
+    //     slide change is announced, autoplay pauses on hover/focus, and it does
+    //     not run at all under prefers-reduced-motion.
     const switchers = document.querySelectorAll('.image-switcher');
     const switcherIntervals = new Map();
+    const reduceCarouselMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const CAROUSEL_INTERVAL = 3000;
 
-    const cycleSlide = (container) => {
-        const slides = container.querySelectorAll('.mockup-slide');
-        const dots = container.querySelectorAll('.iphone-dots .dot');
+    const activeIndexOf = (container) => {
+        const slides = [...container.querySelectorAll('.mockup-slide')];
+        const i = slides.findIndex(s => s.classList.contains('active'));
+        return i < 0 ? 0 : i;
+    };
+
+    const showSlide = (container, requestedIndex) => {
+        const slides = [...container.querySelectorAll('.mockup-slide')];
+        const dots = [...container.querySelectorAll('.iphone-dots .dot')];
         if (slides.length <= 1) return;
 
-        let activeIndex = -1;
-        slides.forEach((slide, i) => {
-            if (slide.classList.contains('active')) activeIndex = i;
+        const currentIndex = activeIndexOf(container);
+        const nextIndex = (requestedIndex + slides.length) % slides.length;
+
+        slides.forEach(s => s.classList.remove('active', 'prev'));
+        if (currentIndex !== nextIndex) slides[currentIndex].classList.add('prev');
+        slides[nextIndex].classList.add('active');
+
+        dots.forEach((dot, i) => {
+            const isActive = i === nextIndex;
+            dot.classList.toggle('active', isActive);
+            if (dot.hasAttribute('aria-selected')) dot.setAttribute('aria-selected', String(isActive));
         });
 
-        // Clear all prev states
-        slides.forEach(s => s.classList.remove('prev'));
-
-        if (activeIndex !== -1) {
-            slides[activeIndex].classList.remove('active');
-            slides[activeIndex].classList.add('prev');
-            if (dots.length) dots[activeIndex].classList.remove('active');
-
-            const nextIndex = (activeIndex + 1) % slides.length;
-            slides[nextIndex].classList.add('active');
-            if (dots.length) dots[nextIndex].classList.add('active');
-        } else {
-            slides[0].classList.add('active');
-            if (dots.length) dots[0].classList.add('active');
+        const status = container.querySelector('#carousel-status');
+        if (status) {
+            const label = slides[nextIndex].dataset.label || `Screen ${nextIndex + 1}`;
+            status.textContent = `${label}, screen ${nextIndex + 1} of ${slides.length}`;
         }
+    };
+
+    const stopCarousel = (container) => {
+        if (!switcherIntervals.has(container)) return;
+        clearInterval(switcherIntervals.get(container));
+        switcherIntervals.delete(container);
+    };
+
+    const startCarousel = (container) => {
+        if (reduceCarouselMotion || switcherIntervals.has(container)) return;
+        switcherIntervals.set(container, setInterval(
+            () => showSlide(container, activeIndexOf(container) + 1), CAROUSEL_INTERVAL));
+    };
+
+    // Restart only if it was already running, so a paused carousel stays paused.
+    const restartCarousel = (container) => {
+        if (!switcherIntervals.has(container)) return;
+        stopCarousel(container);
+        startCarousel(container);
     };
 
     const switcherObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Start auto-cycling every 3s
-                if (!switcherIntervals.has(entry.target)) {
-                    const interval = setInterval(() => cycleSlide(entry.target), 3000);
-                    switcherIntervals.set(entry.target, interval);
-                }
-            } else {
-                // Pause when out of view
-                if (switcherIntervals.has(entry.target)) {
-                    clearInterval(switcherIntervals.get(entry.target));
-                    switcherIntervals.delete(entry.target);
-                }
-            }
+            if (entry.isIntersecting) startCarousel(entry.target);
+            else stopCarousel(entry.target);
         });
     }, { root: null, rootMargin: '0px', threshold: 0.3 });
+
     switchers.forEach(s => {
         switcherObserver.observe(s);
 
-        // Manual interactions (tap/swipe)
-        const triggerNextSlide = () => {
-            cycleSlide(s);
-            // Reset interval to prevent double-cycling immediately
-            if (switcherIntervals.has(s)) {
-                clearInterval(switcherIntervals.get(s));
-                switcherIntervals.set(s, setInterval(() => cycleSlide(s), 3000));
-            }
-        };
+        // Dots are buttons: click and keyboard both work for free.
+        s.querySelectorAll('.iphone-dots .dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showSlide(s, Number(dot.dataset.slide) || 0);
+                restartCarousel(s);
+            });
+        });
 
-        // Click to advance
+        // Tap anywhere on the frame still advances, as before.
+        const advance = () => { showSlide(s, activeIndexOf(s) + 1); restartCarousel(s); };
         s.style.cursor = 'pointer';
-        s.addEventListener('click', triggerNextSlide);
+        s.addEventListener('click', (e) => {
+            if (e.target.closest('.iphone-dots')) return;
+            advance();
+        });
 
-        // Swipe to advance
+        // Swipe, with direction — a horizontal drag now goes the way you dragged.
         let touchStartX = 0;
         let touchStartY = 0;
 
         s.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
-        }, {passive: true});
+        }, { passive: true });
 
         s.addEventListener('touchend', e => {
-            const touchEndX = e.changedTouches[0].screenX;
-            const touchEndY = e.changedTouches[0].screenY;
-            const dx = touchEndX - touchStartX;
-            const dy = touchEndY - touchStartY;
+            const dx = e.changedTouches[0].screenX - touchStartX;
+            const dy = e.changedTouches[0].screenY - touchStartY;
+            if (Math.abs(dx) < 30 || Math.abs(dx) <= Math.abs(dy)) return;
+            showSlide(s, activeIndexOf(s) + (dx < 0 ? 1 : -1));
+            restartCarousel(s);
+        }, { passive: true });
 
-            // If swipe distance is significant enough in any direction
-            if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
-                triggerNextSlide();
-            }
-        }, {passive: true});
+        // Don't move the thing someone is reading or tabbing through.
+        s.addEventListener('mouseenter', () => stopCarousel(s));
+        s.addEventListener('mouseleave', () => startCarousel(s));
+        s.addEventListener('focusin', () => stopCarousel(s));
+        s.addEventListener('focusout', (e) => {
+            if (!s.contains(e.relatedTarget)) startCarousel(s);
+        });
     });
     // 4.5. FAQ Accordion Logic
     const faqQuestions = document.querySelectorAll('.faq-question');
@@ -268,8 +309,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 6. CLI-Style Hero Search Typewriter (Word by Word)
-    const typewriterText = document.getElementById('typewriter-text');
+    // 6. Hero search — a real input whose placeholder cycles example queries.
+    //    It used to be a <div> with a typewriter animation and no way to type
+    //    into it, which meant the most inviting element on the page did nothing.
+    const heroSearchForm = document.getElementById('hero-search');
+    const heroSearchInput = document.getElementById('hero-search-input');
+    const heroSearchNote = document.getElementById('hero-search-note');
     const queries = [
         "BMW AC repair in Al Quoz",
         "Cheap tyres in Sharjah",
@@ -277,37 +322,78 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     let queryIndex = 0;
     let wordIndex = 0;
-    
+    let typewriterStopped = false;
+
+    // Respect reduced-motion: show a complete example instead of animating.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function stopTypewriter() {
+        typewriterStopped = true;
+        if (heroSearchInput) heroSearchInput.placeholder = '';
+    }
+
     function streamWords() {
-        if (!typewriterText) return;
+        if (!heroSearchInput || typewriterStopped) return;
         const currentWords = queries[queryIndex].split(' ');
-        
+
         if (wordIndex < currentWords.length) {
-            // Append word
-            const wordSpan = document.createElement('span');
-            wordSpan.textContent = (wordIndex === 0 ? '' : ' ') + currentWords[wordIndex];
-            wordSpan.style.opacity = '0';
-            typewriterText.appendChild(wordSpan);
-            
-            // Hard cut opacity
-            setTimeout(() => {
-                wordSpan.style.opacity = '1';
-            }, 50); 
-            
+            heroSearchInput.placeholder = currentWords.slice(0, wordIndex + 1).join(' ');
             wordIndex++;
-            setTimeout(streamWords, 300); // Sharp word streaming
+            setTimeout(streamWords, 300);
         } else {
-            // End of phrase, wait then clear
             setTimeout(() => {
-                typewriterText.innerHTML = '';
+                if (typewriterStopped) return;
                 wordIndex = 0;
                 queryIndex = (queryIndex + 1) % queries.length;
-                setTimeout(streamWords, 400); 
-            }, 3000); 
+                heroSearchInput.placeholder = '';
+                setTimeout(streamWords, 400);
+            }, 3000);
         }
     }
-    
-    setTimeout(streamWords, 1200);
+
+    if (heroSearchInput) {
+        if (reduceMotion) {
+            heroSearchInput.placeholder = queries[0];
+        } else {
+            setTimeout(streamWords, 1200);
+        }
+
+        // Once the visitor engages, stop cycling — a moving placeholder under a
+        // caret is disorienting, and their own text is what matters now.
+        heroSearchInput.addEventListener('focus', stopTypewriter, { once: true });
+        heroSearchInput.addEventListener('input', () => {
+            stopTypewriter();
+            heroSearchForm.classList.toggle('has-input', heroSearchInput.value.trim() !== '');
+        });
+    }
+
+    if (heroSearchForm) {
+        heroSearchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = heroSearchInput.value.trim();
+
+            trackEvent('hero_search_submit', query ? { has_query: 'yes' } : { has_query: 'no' });
+
+            // Search itself isn't live yet. Rather than pretend, carry the query
+            // down to the waitlist so it is captured with the signup — that is
+            // the most useful thing we can do with real intent right now.
+            if (query) {
+                pendingHeroQuery = query;
+                if (heroSearchNote) {
+                    heroSearchNote.textContent =
+                        `We'll look for "${query}" when we launch. Leave your email and we'll tell you what we find.`;
+                    heroSearchNote.classList.add('is-confirmed');
+                }
+            }
+
+            const waitlist = document.getElementById('waitlist');
+            if (waitlist) {
+                waitlist.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+                setTimeout(() => document.getElementById('waitlist-email')?.focus(),
+                           reduceMotion ? 0 : 700);
+            }
+        });
+    }
 
     // 7. Live Data Strip Counters
     const garageCountEl = document.getElementById('garage-count');
@@ -913,43 +999,116 @@ document.addEventListener('DOMContentLoaded', () => {
     const supabaseUrl = 'https://zbqtaiozkhfscwynddjd.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpicXRhaW96a2hmc2N3eW5kZGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODkzNjcsImV4cCI6MjA5NDI2NTM2N30.alfx8gruhDhJr1L_zwNt0xrzAaxJdkcgIFnyZdtofa0';
     
-    if (typeof supabase !== 'undefined') {
-        const db = supabase.createClient(supabaseUrl, supabaseAnonKey);
-        const waitlistForm = document.querySelector('.waitlist-form');
-        
-        if (waitlistForm) {
-            waitlistForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const emailInput = waitlistForm.querySelector('input[type="email"]');
-                const btn = waitlistForm.querySelector('button[type="submit"]');
-                const email = emailInput.value.trim();
-                
-                if (!email) return;
-                
-                // Loading state
-                btn.textContent = 'Joining...';
-                btn.style.opacity = '0.7';
-                btn.style.pointerEvents = 'none';
-                
-                // Insert into Supabase (silently ignore errors or duplicates for a smooth UX)
-                const { error } = await db.from('waitlist').insert([{ email }]);
-                
-                // Success Morph (Mechanical Slide-up)
-                waitlistForm.classList.add('is-success');
-                waitlistForm.innerHTML = `
-                    <div class="waitlist-success" role="status" aria-live="polite">
-                        <div class="waitlist-success-inner">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="margin: 0 auto 12px auto; display: block;">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                            <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list!</h3>
-                            <p class="waitlist-microcopy mt-2">We'll notify you at launch.</p>
-                        </div>
-                    </div>
-                `;
-            });
+    const waitlistForm = document.querySelector('.waitlist-form');
+
+    if (waitlistForm) {
+        const emailInput = waitlistForm.querySelector('input[type="email"]');
+        const emirateSelect = waitlistForm.querySelector('select[name="emirate"]');
+        const btn = waitlistForm.querySelector('button[type="submit"]');
+        const errorEl = waitlistForm.querySelector('.waitlist-error');
+
+        // Fire once when the signup section actually comes into view.
+        const waitlistSection = document.getElementById('waitlist');
+        if (waitlistSection) {
+            const viewObserver = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        trackEvent('waitlist_view');
+                        obs.disconnect();
+                    }
+                });
+            }, { threshold: 0.4 });
+            viewObserver.observe(waitlistSection);
         }
+
+        emailInput?.addEventListener('focus', () => trackEvent('waitlist_focus'), { once: true });
+
+        const showError = (message) => {
+            if (!errorEl) return;
+            errorEl.textContent = message;
+            errorEl.hidden = false;
+        };
+
+        const renderSuccess = () => {
+            waitlistForm.classList.add('is-success');
+            waitlistForm.innerHTML = `
+                <div class="waitlist-success" role="status" aria-live="polite">
+                    <div class="waitlist-success-inner">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="margin: 0 auto 12px auto; display: block;" aria-hidden="true">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list!</h3>
+                        <p class="waitlist-microcopy mt-2">We'll notify you at launch.</p>
+                    </div>
+                </div>
+            `;
+        };
+
+        waitlistForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = (emailInput?.value || '').trim();
+            const persona = waitlistForm.querySelector('input[name="persona"]:checked')?.value || null;
+            const emirate = emirateSelect?.value || null;
+
+            if (errorEl) errorEl.hidden = true;
+
+            // novalidate on the form, so validate here to control the message.
+            if (!email || !emailInput.checkValidity()) {
+                showError('That email address does not look right. Mind checking it?');
+                emailInput?.focus();
+                return;
+            }
+
+            trackEvent('waitlist_submit', { persona: persona || 'unknown' });
+
+            const restore = () => {
+                btn.textContent = 'Get Early Access';
+                btn.style.opacity = '';
+                btn.style.pointerEvents = '';
+            };
+
+            btn.textContent = 'Joining...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+
+            // If the Supabase CDN script was blocked, the old code attached no
+            // handler at all and the form did a native GET, putting the address
+            // in the URL bar. Fail loudly instead.
+            if (typeof supabase === 'undefined') {
+                restore();
+                showError("We couldn't reach the signup service. Please try again in a moment.");
+                trackEvent('waitlist_error', { code: 'sdk_unavailable' });
+                return;
+            }
+
+            const db = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+            const row = { email };
+            if (persona) row.persona = persona;
+            if (emirate) row.emirate = emirate;
+            if (pendingHeroQuery) row.first_query = pendingHeroQuery.slice(0, 200);
+
+            const { error } = await db.from('waitlist').insert([row]);
+
+            // 23505 = unique violation, i.e. already signed up. That is a success
+            // from the visitor's point of view, so treat it as one. Everything
+            // else is a real failure and must be surfaced, not swallowed.
+            if (error && error.code !== '23505') {
+                restore();
+                showError("That didn't go through. Please try again.");
+                trackEvent('waitlist_error', { code: error.code || 'unknown' });
+                console.error('[waitlist] insert failed:', error);
+                return;
+            }
+
+            trackEvent('waitlist_success', {
+                persona: persona || 'unknown',
+                emirate: emirate || 'unspecified',
+                from_search: pendingHeroQuery ? 'yes' : 'no'
+            });
+            renderSuccess();
+        });
     }
 
     // 10. Embedded Terms of Use dialog

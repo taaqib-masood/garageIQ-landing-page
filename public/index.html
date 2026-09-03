@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GarageIQ | AI-Powered Garage Discovery UAE</title>
-    <meta name="description" content="Stop guessing between 4.5 stars. Start knowing. GarageIQ analyzes 505,453 reviews to find the right UAE garage for your exact car problem.">
-    
+    <!-- Deliberately no hardcoded review/garage count here: figures drift, and a stale
+         number in a meta description is invisible until someone checks it. -->
+    <meta name="description" content="Stop guessing between 4.5 stars. Start knowing. GarageIQ reads the reviews behind the rating to find the right UAE garage for your exact car problem.">
+    <link rel="canonical" href="https://garage-iq-landing-page.vercel.app/">
+
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
@@ -30,9 +33,83 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20260816-terms-dialog">
+    <link rel="stylesheet" href="style.css?v=20260903-audit-fixes">
+
+    <!-- Structured data. The FAQ answers below mirror the visible FAQ section
+         verbatim; if you edit one, edit the other or the markup is non-compliant. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://garage-iq-landing-page.vercel.app/#organization",
+          "name": "GarageIQ",
+          "url": "https://garage-iq-landing-page.vercel.app/",
+          "logo": "https://garage-iq-landing-page.vercel.app/og-image.png",
+          "description": "AI-powered garage discovery for UAE car owners.",
+          "areaServed": { "@type": "Country", "name": "United Arab Emirates" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://garage-iq-landing-page.vercel.app/#website",
+          "url": "https://garage-iq-landing-page.vercel.app/",
+          "name": "GarageIQ",
+          "publisher": { "@id": "https://garage-iq-landing-page.vercel.app/#organization" },
+          "inLanguage": "en"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://garage-iq-landing-page.vercel.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How does GarageIQ calculate Trust Scores?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Our AI analyzes thousands of reviews for mentions of transparency, reliability, complaint density, and repeat-visit language. It's an aggregate of sentiment, not just an average of star ratings. A 4.5-star rating doesn't mean much if all the text reviews mention overcharging." }
+            },
+            {
+              "@type": "Question",
+              "name": "What does \"Limited Data\" mean?",
+              "acceptedAnswer": { "@type": "Answer", "text": "If a garage has fewer than 5 reviews, we don't have enough evidence to generate a reliable AI profile. Instead of faking a high confidence score, we tag them as \"Limited Data\" so you know to proceed with caution. We never fake confidence." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I book an appointment directly through the app?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. GarageIQ is a discovery and intelligence tool, not a booking platform. We give you the exact context you need (trust, price, specialty) so you can call or WhatsApp the garage directly. This ensures you speak directly to the mechanic, with zero middleman fees." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do you find the Real UAE Price benchmarks?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Our AI scans review text for mentions of specific AED amounts paid by customers for various services (e.g., \"paid 600 for an AC compressor\"), aggregating them into realistic market ranges so you know if you're being overcharged before you even call." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is the app available in Arabic?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. The entire GarageIQ experience, including our AI-generated garage summaries and natural language search, is fully translated and localized for Right-to-Left (RTL) Arabic layouts. You can also use voice search in Arabic." }
+            },
+            {
+              "@type": "Question",
+              "name": "How often is the garage data updated?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Our pipeline runs nightly to ingest new Google reviews, re-analyze sentiment, and update Trust Scores. Price benchmarks are continuously updated as new review text flows in." }
+            },
+            {
+              "@type": "Question",
+              "name": "Do you filter out fake reviews?",
+              "acceptedAnswer": { "@type": "Answer", "text": "While we rely on Google's review ecosystem, our AI is trained to weight specific, detailed reviews over generic, one-word 5-star ratings. Sudden bursts of generic 5-star reviews have minimal impact on the final Trust Score compared to consistent, detailed evidence." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is GarageIQ free for car owners?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes, 100%. GarageIQ is completely free for UAE car owners. We make money by offering premium listings and analytics to garage owners, never by charging users for information." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
+    <a href="#waitlist" class="skip-link">Skip to early access signup</a>
     <div id="brutalist-cursor"></div>
     <div id="scroll-progress"></div>
 
@@ -57,12 +134,16 @@
             </div>
         </div>
         <div class="hero-visual window-wipe-reveal mt-12 z-10">
-            <div class="mockup-search interactive-cta">
-                <div class="search-input"><span id="typewriter-text"></span><span class="cli-cursor"></span></div>
-                <div class="search-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                </div>
-            </div>
+            <form class="mockup-search interactive-cta" id="hero-search" role="search">
+                <label for="hero-search-input" class="visually-hidden">Describe your car problem</label>
+                <input type="text" id="hero-search-input" class="search-input" autocomplete="off"
+                       maxlength="120" aria-describedby="hero-search-note">
+                <span class="cli-cursor" aria-hidden="true"></span>
+                <button type="submit" class="search-btn" aria-label="Search garages">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </form>
+            <p id="hero-search-note" class="hero-search-note" role="status">Search goes live at launch &mdash; tell us what you'd look for and we'll notify you.</p>
         </div>
     </section>
 
@@ -80,25 +161,30 @@
                     <p class="body-light mt-4 mechanical-reveal"><span>You own a car in the UAE. Your brakes are squeaking. You open Google Maps and get 40 pins, all with 4.5+ stars. None of them tell you if they overcharge, if they know German cars, or how fast they actually turn jobs around.</span></p>
                 </div>
                 <div class="visual-block map-visual">
-                    <div class="iphone-frame image-switcher window-wipe-reveal">
+                    <!-- Chassis, notch and dot styling are main's 3D design and are
+                         deliberately unchanged. What was restored here is the control
+                         layer: real buttons, a live region, and labelled slides. -->
+                    <div class="iphone-frame image-switcher window-wipe-reveal"
+                         role="group" aria-roledescription="carousel" aria-label="GarageIQ app preview">
                         <!-- Dynamic Island -->
                         <div class="iphone-notch">
                             <div class="notch-cam"></div>
                         </div>
                         <!-- Screen -->
                         <div class="iphone-screen">
-                            <img src="/app-dark-1.png" alt="GarageIQ Home" class="mockup-slide active" />
-                            <img src="/app-dark-2.png" alt="GarageIQ Reviews" class="mockup-slide" />
-                            <img src="/app-dark-3.png" alt="GarageIQ Garage Profile" class="mockup-slide" />
-                            <img src="/app-dark-4.png" alt="GarageIQ Search" class="mockup-slide" />
+                            <img src="/app-dark-1.webp" alt="GarageIQ home screen" data-label="Home" class="mockup-slide active" width="513" height="1024" fetchpriority="high" decoding="async" />
+                            <img src="/app-dark-2.webp" alt="GarageIQ reviews screen" data-label="Reviews" class="mockup-slide" width="513" height="1024" loading="lazy" decoding="async" />
+                            <img src="/app-dark-3.webp" alt="GarageIQ garage profile screen" data-label="Garage profile" class="mockup-slide" width="512" height="1024" loading="lazy" decoding="async" />
+                            <img src="/app-dark-4.webp" alt="GarageIQ search screen" data-label="Search" class="mockup-slide" width="513" height="1024" loading="lazy" decoding="async" />
                         </div>
-                        <!-- Progress dots -->
-                        <div class="iphone-dots">
-                            <span class="dot active"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
+                        <!-- Progress dots: real buttons, so they are reachable and operable -->
+                        <div class="iphone-dots" role="tablist" aria-label="Choose an app screen">
+                            <button type="button" class="dot active" role="tab" data-slide="0" aria-selected="true"  aria-label="Show home screen"></button>
+                            <button type="button" class="dot"        role="tab" data-slide="1" aria-selected="false" aria-label="Show reviews screen"></button>
+                            <button type="button" class="dot"        role="tab" data-slide="2" aria-selected="false" aria-label="Show garage profile screen"></button>
+                            <button type="button" class="dot"        role="tab" data-slide="3" aria-selected="false" aria-label="Show search screen"></button>
                         </div>
+                        <p class="visually-hidden" aria-live="polite" id="carousel-status">Home, screen 1 of 4</p>
                     </div>
                 </div>
             </div>
@@ -502,11 +588,37 @@
             <div class="content text-center z-10 w-full" style="max-width: 600px; margin: 0 auto;">
                 <h2 class="headline-heavy mechanical-reveal"><span>Stop guessing.</span><br><span>Start knowing.</span></h2>
                 
-                <form class="waitlist-form mt-8 w-full mechanical-reveal">
+                <form class="waitlist-form mt-8 w-full mechanical-reveal" novalidate>
+                    <fieldset class="waitlist-persona">
+                        <legend class="visually-hidden">Who are you?</legend>
+                        <label class="persona-option">
+                            <input type="radio" name="persona" value="driver" checked>
+                            <span>I drive a car</span>
+                        </label>
+                        <label class="persona-option">
+                            <input type="radio" name="persona" value="garage_owner">
+                            <span>I own a garage</span>
+                        </label>
+                    </fieldset>
+
                     <div class="waitlist-input-group">
-                        <input type="email" placeholder="Your email address" class="waitlist-input interactive-cta" required>
+                        <label for="waitlist-email" class="visually-hidden">Your email address</label>
+                        <input type="email" id="waitlist-email" name="email" placeholder="Your email address"
+                               class="waitlist-input interactive-cta" autocomplete="email" required>
+                        <label for="waitlist-emirate" class="visually-hidden">Your emirate</label>
+                        <select id="waitlist-emirate" name="emirate" class="waitlist-select interactive-cta">
+                            <option value="">Emirate (optional)</option>
+                            <option value="dubai">Dubai</option>
+                            <option value="abu_dhabi">Abu Dhabi</option>
+                            <option value="sharjah">Sharjah</option>
+                            <option value="ajman">Ajman</option>
+                            <option value="ras_al_khaimah">Ras Al Khaimah</option>
+                            <option value="fujairah">Fujairah</option>
+                            <option value="umm_al_quwain">Umm Al Quwain</option>
+                        </select>
                         <button type="submit" class="btn-primary magnetic-btn interactive-cta waitlist-btn">Get Early Access</button>
                     </div>
+                    <p class="waitlist-error" role="alert" hidden></p>
                     <p class="waitlist-microcopy mt-4">We respect your privacy. No spam, just a launch notification.</p>
                 </form>
 
@@ -529,17 +641,24 @@
             </svg>
 
             <div class="content w-full flex-col-center z-10" style="flex-grow: 1; justify-content: center; height: 100%;">
-                <h1 class="monolith-wordmark"><span>GarageIQ</span></h1>
+                <!-- Demoted from <h1>: the page gets exactly one h1, and it is the hero
+                     headline. This is a wordmark, not a heading. -->
+                <div class="monolith-wordmark"><span>GarageIQ</span></div>
+                <!--
+                  ABOUT US / CONTACT US / INSTAGRAM / LINKEDIN removed 2026-09-03.
+
+                  All four were href="#" — they went nowhere. Dead links read as an
+                  unfinished site to a visitor and as low quality to a crawler, and
+                  there are no real destinations to point them at yet (the Terms of
+                  Use dialog still has [SUPPORT EMAIL] and [FULL LEGAL ENTITY NAME]
+                  unfilled).
+
+                  Restore each one as its destination becomes real, not before.
+                -->
                 <div class="footer-links mt-8">
-                    <a href="#" class="interactive-text">ABOUT US</a>
-                    <span class="dot-separator">&middot;</span>
-                    <a href="#" class="interactive-text">CONTACT US</a>
-                    <span class="dot-separator">&middot;</span>
                     <a href="#terms-of-use" class="interactive-text" data-open-terms>TERMS OF USE</a>
                     <span class="dot-separator">&middot;</span>
-                    <a href="#" class="interactive-text">INSTAGRAM</a>
-                    <span class="dot-separator">&middot;</span>
-                    <a href="#" class="interactive-text">LINKEDIN</a>
+                    <a href="#waitlist" class="interactive-text">GET EARLY ACCESS</a>
                 </div>
             </div>
             
@@ -692,7 +811,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="uae-paths.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="main.js?v=20260816-terms-dialog"></script>
+    <script src="main.js?v=20260903-audit-fixes"></script>
     
     <!-- Vercel Analytics -->
     <script defer src="/_vercel/insights/script.js"></script>
