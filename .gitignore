@@ -1,0 +1,17 @@
+# This repo exists to deploy public/ as a static site (see vercel.json).
+# It began as a copy of the private GarageIQ monorepo and inherited none of
+# its .gitignore, which is how apps/api/.env and 37k node_modules files ended
+# up committed to a PUBLIC repository. Keep this file.
+
+node_modules/
+.vercel/
+dist/
+build/output/
+.DS_Store
+
+# Never commit secrets. The app's real config lives in Render/Vercel env vars.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
