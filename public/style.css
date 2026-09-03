@@ -134,7 +134,12 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: var(--text-color);
+    /* Was var(--text-color) — near-black, and therefore invisible over the four
+       black sections (hero, intelligence-network, waitlist, footer), including
+       the whole first screen. Painting white and differencing against whatever
+       is behind keeps it visible on both grounds without scroll-position hacks. */
+    background-color: #FFFFFF;
+    mix-blend-mode: difference;
     transform-origin: left;
     transform: scaleX(0);
     z-index: 9999;
@@ -734,6 +739,26 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 }
 
 .bg-black .iphone-dots .dot:focus-visible { outline-color: #FFFFFF; }
+
+/* The dots read as 6px, but a 6px tap target is not operable on a phone
+   (WCAG 2.5.8 wants 24px, Apple HIG wants 44px). This grows the hit area to
+   44px with a transparent pseudo-element while the dot itself stays 6px.
+   position:relative is safe here: the dots are laid out by flex, not offsets. */
+.iphone-dots .dot { position: relative; }
+
+.iphone-dots .dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+}
+
+/* Same problem, smaller scale: give the row enough room for the bigger
+   targets so neighbouring dots do not overlap each other's hit areas. */
+.iphone-dots { gap: 14px; }
 
 .iphone-dots .dot.active {
     opacity: 1;
@@ -2304,4 +2329,166 @@ html.legal-dialog-open body {
         margin-top: 0.5rem;
         width: 100%;
     }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Reduced motion
+
+   This page carries ~80 animated elements: reveal transitions, parallax
+   numerals, a marquee, botanical drawings, a custom cursor and an
+   auto-advancing carousel. There was no prefers-reduced-motion support at all.
+
+   The important subtlety: several reveal styles have a HIDDEN resting state
+   (.mechanical-reveal span is opacity:0, .window-wipe-reveal is fully clipped)
+   and only become visible when the IntersectionObserver adds .is-visible.
+   Simply disabling animation would leave the page blank. So each of those is
+   explicitly forced to its finished, visible state here.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Force the finished state of every reveal, observer or not. */
+    .mechanical-reveal span {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .window-wipe-reveal {
+        clip-path: none !important;
+        transform: none !important;
+    }
+
+    .stagger-reveal,
+    .fade-in-content {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* Parallax and the marquee are pure decoration; hold them still. */
+    .parallax-numeral { transform: none !important; }
+    .marquee-strip { animation: none !important; }
+    .botanical-accent svg,
+    .botanical-monolith { animation: none !important; }
+
+    /* The custom cursor is a moving element that tracks the pointer. */
+    #brutalist-cursor { display: none !important; }
+    .cli-cursor { animation: none !important; opacity: 1 !important; }
+}
+
+/* ── Back to top ────────────────────────────────────────────────────────── */
+.back-to-top {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 9998;
+    width: 48px;              /* comfortably over the 44px touch minimum */
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--text-color);
+    border-radius: 100px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s var(--ease-brutal),
+                transform 0.25s var(--ease-brutal),
+                background 0.2s var(--ease-brutal),
+                color 0.2s var(--ease-brutal);
+}
+
+.back-to-top[hidden] { display: none; }
+.back-to-top.is-visible { opacity: 1; transform: translateY(0); }
+
+.back-to-top svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.back-to-top:hover,
+.back-to-top:focus-visible {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.back-to-top:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 3px;
+}
+
+/* ── noscript notice ────────────────────────────────────────────────────── */
+.noscript-notice {
+    margin: 1.5rem auto 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    max-width: 32rem;
+    text-align: center;
+}
+
+/* ── Minimum touch targets ──────────────────────────────────────────────────
+   Several controls rendered under 44px tall. Rather than change the type or
+   the composition, the hit area is grown around the existing visual with a
+   pseudo-element, which leaves the design untouched.
+   ────────────────────────────────────────────────────────────────────────── */
+.btn-secondary,
+.footer-links a {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-secondary::after,
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    min-height: 44px;
+}
+
+/* The link-hover underline already uses ::after, so don't fight it there. */
+.btn-secondary.link-hover::after { min-height: 0; }
+
+.search-btn { min-width: 44px; min-height: 44px; }
+
+.persona-option span { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+
+/* ── Focus visibility ───────────────────────────────────────────────────────
+   Only four :focus-visible rules existed across 24 focusable elements, so
+   keyboard users lost their place constantly. One baseline rule, then the
+   inverse on dark sections so it is visible on both grounds.
+   ────────────────────────────────────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.bg-black a:focus-visible,
+.bg-black button:focus-visible,
+.bg-black input:focus-visible,
+.bg-black select:focus-visible {
+    outline-color: #FFFFFF;
 }

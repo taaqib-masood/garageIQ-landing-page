@@ -33,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20260903-funnel">
+    <link rel="stylesheet" href="style.css?v=20260903-ux">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -113,6 +113,15 @@
     <div id="brutalist-cursor"></div>
     <div id="scroll-progress"></div>
 
+    <!--
+      The page is ~16 screens on a phone with no navigation of any kind, so
+      once you are down in the FAQ the only way back to the signup is a long
+      manual scroll. Appears after two screens; hidden until then.
+    -->
+    <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
     <!-- Section 1: The Hero (Sticky Projector Pin) -->
     <section id="hero" class="section viewport-height grid-container bg-black sticky-hero">
         <div class="grid-line left-line"></div>
@@ -178,11 +187,11 @@
                             <img src="/app-dark-4.webp" alt="GarageIQ search screen" data-label="Search" class="mockup-slide" width="513" height="1024" loading="lazy" decoding="async" />
                         </div>
                         <!-- Progress dots: real buttons, so they are reachable and operable -->
-                        <div class="iphone-dots" role="tablist" aria-label="Choose an app screen">
-                            <button type="button" class="dot active" role="tab" data-slide="0" aria-selected="true"  aria-label="Show home screen"></button>
-                            <button type="button" class="dot"        role="tab" data-slide="1" aria-selected="false" aria-label="Show reviews screen"></button>
-                            <button type="button" class="dot"        role="tab" data-slide="2" aria-selected="false" aria-label="Show garage profile screen"></button>
-                            <button type="button" class="dot"        role="tab" data-slide="3" aria-selected="false" aria-label="Show search screen"></button>
+                        <div class="iphone-dots" role="group" aria-label="Choose an app screen">
+                            <button type="button" class="dot active" data-slide="0" aria-current="true"  aria-label="Show home screen"></button>
+                            <button type="button" class="dot"        data-slide="1" aria-current="false" aria-label="Show reviews screen"></button>
+                            <button type="button" class="dot"        data-slide="2" aria-current="false" aria-label="Show garage profile screen"></button>
+                            <button type="button" class="dot"        data-slide="3" aria-current="false" aria-label="Show search screen"></button>
                         </div>
                         <p class="visually-hidden" aria-live="polite" id="carousel-status">Home, screen 1 of 4</p>
                     </div>
@@ -588,6 +597,20 @@
             <div class="content text-center z-10 w-full" style="max-width: 600px; margin: 0 auto;">
                 <h2 class="headline-heavy mechanical-reveal"><span>Stop guessing.</span><br><span>Start knowing.</span></h2>
                 
+                <!--
+                  Without JS the form cannot submit: the insert goes through the
+                  Supabase SDK, and PostgREST will not accept a urlencoded native
+                  form POST. Previously that failed silently — the visitor filled
+                  the field, pressed the button and nothing whatsoever happened.
+                  Say so instead of pretending.
+                -->
+                <noscript>
+                    <p class="noscript-notice">
+                        Signup needs JavaScript, which is currently turned off.
+                        Enable it for this page and the form below will work.
+                    </p>
+                </noscript>
+
                 <form class="waitlist-form mt-8 w-full mechanical-reveal" novalidate>
                     <fieldset class="waitlist-persona">
                         <legend class="visually-hidden">Who are you?</legend>
@@ -811,7 +834,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="uae-paths.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="main.js?v=20260903-funnel"></script>
+    <script src="main.js?v=20260903-ux"></script>
     
     <!--
       Vercel Analytics.

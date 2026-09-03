@@ -74,6 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Query typed into the hero search, carried down to the waitlist submit.
     let pendingHeroQuery = '';
 
+    // Declared once, up here, because several features below need it and a
+    // `const` further down would be in the temporal dead zone for all of them.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // 0. The "Ink Ring" Custom Cursor
     const cursor = document.getElementById('brutalist-cursor');
     const cursorMediaQuery = window.matchMedia('(any-hover: hover) and (any-pointer: fine)');
@@ -251,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dots.forEach((dot, i) => {
             const isActive = i === nextIndex;
             dot.classList.toggle('active', isActive);
-            if (dot.hasAttribute('aria-selected')) dot.setAttribute('aria-selected', String(isActive));
+            if (dot.hasAttribute('aria-current')) dot.setAttribute('aria-current', String(isActive));
         });
 
         const status = container.querySelector('#carousel-status');
@@ -324,6 +328,25 @@ document.addEventListener('DOMContentLoaded', () => {
             restartCarousel(s);
         }, { passive: true });
 
+        // Arrow keys on the dot group, which is what the tablist role promises.
+        // Focus follows selection so the dot you land on is the slide you see.
+        const dots = [...s.querySelectorAll('.iphone-dots .dot')];
+        s.querySelector('.iphone-dots')?.addEventListener('keydown', (e) => {
+            const current = activeIndexOf(s);
+            let next = null;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = current + 1;
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = current - 1;
+            else if (e.key === 'Home') next = 0;
+            else if (e.key === 'End') next = dots.length - 1;
+            if (next === null) return;
+
+            e.preventDefault();
+            const idx = (next + dots.length) % dots.length;
+            showSlide(s, idx);
+            dots[idx]?.focus();
+            restartCarousel(s);
+        });
+
         // Don't move the thing someone is reading or tabbing through.
         s.addEventListener('mouseenter', () => stopCarousel(s));
         s.addEventListener('mouseleave', () => startCarousel(s));
@@ -333,20 +356,101 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     // 4.5. FAQ Accordion Logic
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach(q => {
-        q.addEventListener('click', () => {
-            const item = q.closest('.faq-item');
-            const isOpen = item.classList.contains('is-open');
-            
+    //
+    // The buttons carried no aria-expanded, so a screen reader announced eight
+    // identical-sounding buttons with no way to tell open from closed. Each
+    // question also now owns a stable id, which makes individual answers
+    // linkable (#faq-...) and therefore shareable.
+    const faqItems = [...document.querySelectorAll('.faq-item')];
+
+    const slugify = (text) => text.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
+
+    const setFaqOpen = (item, open) => {
+        item.classList.toggle('is-open', open);
+        const btn = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        btn?.setAttribute('aria-expanded', String(open));
+        // Not `hidden`: the answer collapses via a grid-template-rows 0fr->1fr
+        // transition, and display:none would kill the animation outright.
+        // `inert` takes the collapsed text out of the a11y tree and tab order
+        // while leaving the layout — and therefore the transition — intact.
+        if (answer) answer.inert = !open;
+    };
+
+    faqItems.forEach((item) => {
+        const btn = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+        if (!btn || !answer) return;
+
+        const slug = 'faq-' + slugify(btn.textContent || '');
+        item.id = slug;
+        answer.id = slug + '-answer';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-controls', answer.id);
+        answer.inert = true;
+
+        btn.addEventListener('click', () => {
+            const willOpen = !item.classList.contains('is-open');
             // Brutalist: instantly close others
-            document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('is-open'));
-            
-            if (!isOpen) {
-                item.classList.add('is-open');
+            faqItems.forEach(other => setFaqOpen(other, false));
+            setFaqOpen(item, willOpen);
+            if (willOpen) {
+                // Make the open question linkable without adding a history entry
+                // for every toggle.
+                history.replaceState(null, '', '#' + slug);
             }
         });
     });
+
+    // 4.6 Back to top — the page has no navigation and runs ~16 screens on a
+    //     phone, so this is the only way back to the CTA without a long scroll.
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+        const THRESHOLD = () => window.innerHeight * 2;
+        let shown = false;
+
+        const syncBackToTop = () => {
+            const should = window.scrollY > THRESHOLD();
+            if (should === shown) return;
+            shown = should;
+            if (should) {
+                backToTop.hidden = false;
+                // Next frame, so the transition has a start value to animate from.
+                requestAnimationFrame(() => backToTop.classList.add('is-visible'));
+            } else {
+                backToTop.classList.remove('is-visible');
+                // Only truly hide once the fade has finished.
+                setTimeout(() => { if (!shown) backToTop.hidden = true; },
+                           reduceMotion ? 0 : 250);
+            }
+        };
+
+        window.addEventListener('scroll', syncBackToTop, { passive: true });
+        syncBackToTop();
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+            // Send focus somewhere sensible instead of leaving it on a button
+            // that is about to disappear.
+            document.querySelector('.skip-link')?.focus();
+        });
+    }
+
+    // Deep link: /#faq-how-does-garageiq-calculate-trust-scores opens that answer.
+    const openFaqFromHash = () => {
+        const hash = decodeURIComponent(location.hash.slice(1));
+        if (!hash.startsWith('faq-')) return;
+        const target = faqItems.find(i => i.id === hash);
+        if (!target) return;
+        faqItems.forEach(other => setFaqOpen(other, false));
+        setFaqOpen(target, true);
+        target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    };
+    openFaqFromHash();
+    window.addEventListener('hashchange', openFaqFromHash);
 
     // 5. Magnetic Hover Effect for CTAs (Preserved but brutalized)
     const magneticBtns = document.querySelectorAll('.magnetic-btn');
@@ -383,8 +487,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let wordIndex = 0;
     let typewriterStopped = false;
 
-    // Respect reduced-motion: show a complete example instead of animating.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // reduceMotion is declared at the top of this file: under it, the hero
+    // shows a complete example query instead of animating one.
 
     function stopTypewriter() {
         typewriterStopped = true;
@@ -1082,6 +1186,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         emailInput?.addEventListener('focus', () => trackEvent('waitlist_focus'), { once: true });
+
+        // Remember the emirate across visits. Small thing, but this is the one
+        // field a returning visitor would otherwise re-pick every time.
+        try {
+            const saved = localStorage.getItem('giq_emirate');
+            if (saved && emirateSelect && [...emirateSelect.options].some(o => o.value === saved)) {
+                emirateSelect.value = saved;
+            }
+            emirateSelect?.addEventListener('change', () => {
+                try { localStorage.setItem('giq_emirate', emirateSelect.value); } catch (_) {}
+            });
+        } catch (_) {
+            /* private mode: not worth a fallback */
+        }
 
         const showError = (message) => {
             if (!errorEl) return;
