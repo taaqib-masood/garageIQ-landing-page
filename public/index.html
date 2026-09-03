@@ -813,7 +813,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="main.js?v=20260903-audit-fixes"></script>
     
-    <!-- Vercel Analytics -->
+    <!--
+      Vercel Analytics.
+
+      The queue shim is required for plain-HTML projects and was missing: the
+      real script is deferred, so without this, any event fired before it loads
+      (waitlist_view fires on scroll, which can easily beat it) hits an
+      undefined window.va and is dropped silently. The shim queues those calls
+      into window.vaq and the script flushes them once it arrives.
+
+      NOTE: /_vercel/insights/script.js currently 404s in production because
+      Web Analytics is not enabled on the Vercel project. Until it is switched
+      on, these events are queued and then discarded. Enable with:
+          vercel project web-analytics garage-iq-landing-page-api
+      or Project -> Analytics -> Enable in the dashboard.
+    -->
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
     <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
