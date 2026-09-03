@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://garageiq.ae/sitemap.xml
+Sitemap: https://www.garageiq.ae/sitemap.xml
