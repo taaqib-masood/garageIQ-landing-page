@@ -33,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20260903-audit-fixes">
+    <link rel="stylesheet" href="style.css?v=20260903-funnel">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -811,7 +811,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="uae-paths.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="main.js?v=20260903-audit-fixes"></script>
+    <script src="main.js?v=20260903-funnel"></script>
     
     <!--
       Vercel Analytics.
@@ -822,11 +822,12 @@
       undefined window.va and is dropped silently. The shim queues those calls
       into window.vaq and the script flushes them once it arrives.
 
-      NOTE: /_vercel/insights/script.js currently 404s in production because
-      Web Analytics is not enabled on the Vercel project. Until it is switched
-      on, these events are queued and then discarded. Enable with:
+      NOTE: /_vercel/insights/script.js 404s because Web Analytics is not
+      enabled on this Vercel project, and it cannot be enabled through the API
+      or MCP. Rather than depend on a dashboard toggle, the funnel is recorded
+      first-party in public.landing_events (see trackEvent in main.js) and this
+      stays as a harmless secondary sink. To also turn Vercel's on:
           vercel project web-analytics garage-iq-landing-page-api
-      or Project -> Analytics -> Enable in the dashboard.
     -->
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
