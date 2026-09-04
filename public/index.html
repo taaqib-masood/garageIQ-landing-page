@@ -30,10 +30,12 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20260903-www">
+    <!-- The font is self-hosted now (see the @font-face at the top of style.css),
+         so the two Google origins and their render-blocking stylesheet are gone.
+         Preloaded because it is discovered inside the CSS rather than in the HTML,
+         which would otherwise delay it by a full round trip. -->
+    <link rel="preload" href="/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260904-perf3">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -831,10 +833,18 @@
         </div>
     </dialog>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="uae-paths.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="main.js?v=20260903-www"></script>
+    <!--
+      supabase-js (54 KB, measured 1044 ms on Slow 4G) removed: the one INSERT it
+      performed is now a plain fetch against /rest/v1, the same way trackEvent
+      already posts to /rest/v1/landing_events.
+
+      three.js (118 KB, 1587 ms) and uae-paths.js (14 KB) are no longer loaded
+      here either. They serve only the decorative map about four screens down,
+      and main.js now fetches them when that section comes within ~600px of the
+      viewport. Between them these were 64% of the page's bytes, none of it
+      needed for first paint.
+    -->
+    <script src="main.js?v=20260904-perf3"></script>
     
     <!--
       Vercel Analytics.
