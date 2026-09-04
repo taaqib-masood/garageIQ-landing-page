@@ -1312,7 +1312,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ])
                 .then(initPixelMap)
                 .catch((err) => console.warn('[map] skipped:', err.message));
-        }, { rootMargin: '600px 0px' });
+        // 600px was too tight. three.js is 118 KB, and on a slow connection a
+        // visitor scrolling at a normal pace arrived at the section while it was
+        // still downloading — the canvas sat empty and the counters read 0,
+        // which looked broken rather than merely late. Two full screens of
+        // warning costs nothing (it still never loads for anyone who does not
+        // scroll that far) and covers the download comfortably.
+        }, { rootMargin: '200% 0px' });
         mapLoader.observe(mapSection);
     }
 
