@@ -857,10 +857,25 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     .split-layout.reverse { flex-direction: row-reverse; }
 }
 
-/* ── 3D Premium Phone Mockup ── */
+/* ── 3D Premium Phone Mockup ──
+ *
+ * Height is derived, not chosen. The screenshots are 514×1024 (aspect 0.5020)
+ * and the screen's inner width is 260px (280 − 2×10 padding). At the old 572px
+ * the screen was 260×552, aspect 0.4710 — narrower than the image — so
+ * `object-fit: cover` scaled to fill the height and sheared 22px off the sides.
+ * That is why the app's own "GARAGEIQ" header lost its G and the right-hand
+ * cards ran off the edge.
+ *
+ *   image      260 / 0.5020        = 518px tall
+ *   status bar                     =  20px  (clearance for the Dynamic Island)
+ *   screen     20 + 518            = 538px
+ *   frame      538 + 2×10 padding  = 558px
+ *
+ * Now the aspect matches to four decimal places, so cover crops nothing.
+ */
 .iphone-frame {
     width: 280px;
-    height: 572px;
+    height: 558px;
     border-radius: 44px;
     background: #0d0d0d;
     margin: 0 auto;
@@ -976,13 +991,21 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 /* Slide Animations */
 .mockup-slide {
     position: absolute;
-    top: 0;
+    /* Sits below the Dynamic Island rather than under it. The screenshots begin
+       with the app's own header at pixel zero — they carry no status bar — so
+       at top: 0 the notch sat on top of the GarageIQ wordmark and the theme and
+       avatar controls. This 20px of screen background reads as the status bar
+       the screenshots are missing. */
+    top: 20px;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 20px);
     object-fit: cover;
     object-position: top center;
-    border-radius: 38px;
+    /* The screen already clips with overflow: hidden and its own 32px radius.
+       Rounding the image too fought that, and now that the image is inset from
+       the top its corners no longer line up with the screen's. */
+    border-radius: 0;
     opacity: 0;
     transform: scale(1.04);
     z-index: 1;

@@ -35,7 +35,12 @@
          Preloaded because it is discovered inside the CSS rather than in the HTML,
          which would otherwise delay it by a full round trip. -->
     <link rel="preload" href="/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260904-readout">
+
+    <!-- three.js is fetched lazily from here when the map section is approached.
+         Warming the connection now means the download starts on arrival rather
+         than after a DNS + TLS handshake. Costs one connection, no bytes. -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260904-phone">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -862,7 +867,7 @@
       viewport. Between them these were 64% of the page's bytes, none of it
       needed for first paint.
     -->
-    <script src="main.js?v=20260904-readout"></script>
+    <script src="main.js?v=20260904-phone"></script>
     
     <!--
       Vercel Analytics.
