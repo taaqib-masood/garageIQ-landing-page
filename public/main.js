@@ -514,6 +514,122 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ── Live parse readout ──────────────────────────────────────────────────
+    // The hero's whole argument is that a messy sentence contains structure.
+    // Rather than assert that, the field demonstrates it: as you type, the
+    // fields the real search API returns (vehicle_brand, service_type,
+    // location_text, price_band) light up underneath.
+    //
+    // Matched client-side against a deliberately small vocabulary. This is a
+    // preview of the idea, not the actual resolver — it recognises the common
+    // cases and stays quiet on everything else, which is the honest failure
+    // mode for a demo standing in front of a product that has not launched.
+    const readoutExamples = document.getElementById('readout-examples');
+    const readoutTags = document.getElementById('readout-tags');
+
+    const VOCAB = {
+        brand: ['BMW', 'Mercedes', 'Audi', 'Toyota', 'Nissan', 'Lexus', 'Honda',
+                'Porsche', 'Range Rover', 'Land Rover', 'Jeep', 'Hyundai', 'Kia',
+                'Mitsubishi', 'Chevrolet', 'Volkswagen', 'Mazda', 'Infiniti',
+                'GMC', 'Tesla', 'Ford', 'Patrol', 'Land Cruiser'],
+        service: ['AC repair', 'air conditioning', 'oil change', 'brakes', 'brake pads',
+                  'tyres', 'tires', 'battery', 'gearbox', 'transmission', 'suspension',
+                  'bodywork', 'body shop', 'engine', 'clutch', 'radiator',
+                  'alignment', 'detailing', 'paint', 'service'],
+        area: ['Al Quoz', 'Deira', 'Jumeirah', 'Al Barsha', 'Mussafah', 'Al Qusais',
+               'Business Bay', 'Motor City', 'Sheikh Zayed Road', 'Al Ain',
+               'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah',
+               'Fujairah', 'Umm Al Quwain']
+    };
+
+    // Longest first, so "Land Cruiser" wins over "Land Rover"'s prefix and
+    // "brake pads" over "brakes".
+    Object.keys(VOCAB).forEach(k => VOCAB[k].sort((a, b) => b.length - a.length));
+
+    const findTerm = (haystack, list) =>
+        list.find(term => haystack.includes(term.toLowerCase())) || null;
+
+    const parseQuery = (raw) => {
+        const q = raw.toLowerCase();
+        const found = [];
+
+        const brand = findTerm(q, VOCAB.brand);
+        if (brand) found.push(['brand', brand]);
+
+        const service = findTerm(q, VOCAB.service);
+        if (service) {
+            // Present the two spellings and the long form under one label.
+            const label = /tire/.test(service) ? 'Tyres'
+                        : /air conditioning/.test(service) ? 'AC repair'
+                        : service;
+            found.push(['service', label.charAt(0).toUpperCase() + label.slice(1)]);
+        }
+
+        const area = findTerm(q, VOCAB.area);
+        if (area) found.push(['area', area]);
+
+        // The API calls this price_band, so the label is "price" and the value
+        // is the band — "BUDGET Budget" read as a stutter.
+        const capped = q.match(/(?:under|below|max|less than)\s*(\d{2,5})/);
+        if (capped) {
+            found.push(['price', `Under ${capped[1]} AED`]);
+        } else if (/\b(cheap|budget|affordable|inexpensive)\b/.test(q)) {
+            found.push(['price', 'Budget']);
+        }
+        return found;
+    };
+
+    const renderReadout = (value) => {
+        if (!readoutTags || !readoutExamples) return;
+        const tags = parseQuery(value.trim());
+
+        if (!value.trim()) {
+            readoutTags.hidden = true;
+            readoutTags.replaceChildren();
+            readoutExamples.hidden = false;
+            return;
+        }
+
+        readoutExamples.hidden = true;
+
+        // Rebuild only when the result actually changed, so tags do not
+        // re-animate on every keystroke.
+        const signature = tags.map(t => t.join(':')).join('|');
+        if (readoutTags.dataset.signature === signature) return;
+        readoutTags.dataset.signature = signature;
+
+        readoutTags.replaceChildren();
+        readoutTags.hidden = tags.length === 0;
+
+        tags.forEach(([label, val], i) => {
+            const li = document.createElement('li');
+            li.className = 'readout-tag';
+            if (!reduceMotion) li.style.animationDelay = `${i * 45}ms`;
+
+            const l = document.createElement('span');
+            l.className = 'readout-tag-label';
+            l.textContent = label;
+
+            const v = document.createElement('span');
+            v.className = 'readout-tag-value';
+            v.textContent = val;   // textContent, never innerHTML — this is user input
+
+            li.append(l, v);
+            readoutTags.append(li);
+        });
+    };
+
+    readoutExamples?.querySelectorAll('.readout-example').forEach(btn => {
+        btn.addEventListener('click', () => {
+            heroSearchInput.value = btn.textContent.trim();
+            stopTypewriter();
+            heroSearchForm.classList.add('has-input');
+            renderReadout(heroSearchInput.value);
+            heroSearchInput.focus();
+            trackEvent('hero_example_used');
+        });
+    });
+
     if (heroSearchInput) {
         if (reduceMotion) {
             heroSearchInput.placeholder = queries[0];
@@ -527,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
         heroSearchInput.addEventListener('input', () => {
             stopTypewriter();
             heroSearchForm.classList.toggle('has-input', heroSearchInput.value.trim() !== '');
+            renderReadout(heroSearchInput.value);
         });
     }
 

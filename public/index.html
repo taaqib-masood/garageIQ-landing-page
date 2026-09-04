@@ -35,7 +35,7 @@
          Preloaded because it is discovered inside the CSS rather than in the HTML,
          which would otherwise delay it by a full round trip. -->
     <link rel="preload" href="/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260904-perf3">
+    <link rel="stylesheet" href="style.css?v=20260904-readout">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -154,6 +154,24 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
             </form>
+            <!--
+              The readout is the hero's argument made literal: type a messy
+              sentence, watch it become structured signal. It mirrors the fields
+              the real search API already returns (vehicle_brand, service_type,
+              location_text, price_band), matched client-side so it costs no
+              request and works before launch.
+
+              Fixed min-height so tags appearing never shift the layout.
+            -->
+            <div class="hero-readout">
+                <div class="readout-examples" id="readout-examples">
+                    <span class="readout-lead">Try</span>
+                    <button type="button" class="readout-example">BMW AC repair in Al Quoz</button>
+                    <button type="button" class="readout-example">Cheap tyres in Sharjah</button>
+                    <button type="button" class="readout-example">Nissan gearbox Abu Dhabi</button>
+                </div>
+                <ul class="readout-tags" id="readout-tags" aria-live="polite" hidden></ul>
+            </div>
             <p id="hero-search-note" class="hero-search-note" role="status">Search goes live at launch &mdash; tell us what you'd look for and we'll notify you.</p>
         </div>
     </section>
@@ -844,7 +862,7 @@
       viewport. Between them these were 64% of the page's bytes, none of it
       needed for first paint.
     -->
-    <script src="main.js?v=20260904-perf3"></script>
+    <script src="main.js?v=20260904-readout"></script>
     
     <!--
       Vercel Analytics.

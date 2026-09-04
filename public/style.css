@@ -464,12 +464,141 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .bg-black .search-input { color: #FFFFFF; }
 .bg-black .search-input::placeholder { color: #FFFFFF; opacity: 0.62; }
 
+/*
+ * One focus ring, not two.
+ *
+ * This used to draw an outline on the container while the generic
+ * `input:focus-visible` rule further down drew a second one on the input
+ * itself — the input's own `outline: none` above is declared earlier and lost.
+ * The result was two concentric white rectangles around the field.
+ *
+ * The container is the thing that looks like a control, so it keeps the ring
+ * and the input is explicitly silenced at a specificity that actually wins.
+ */
 .mockup-search:focus-within {
     outline: 2px solid var(--text-color);
     outline-offset: 3px;
 }
 
 .bg-black .mockup-search:focus-within { outline-color: #FFFFFF; }
+
+.search-input:focus,
+.search-input:focus-visible {
+    outline: none;
+}
+
+/* The field reads as instrumentation waking up: the border goes from the
+   dim idle grey to full contrast on focus. */
+.mockup-search {
+    transition: border-color 0.25s var(--ease-brutal);
+}
+
+.bg-black .mockup-search:focus-within { border-color: #FFFFFF; }
+
+.search-btn {
+    transition: transform 0.2s var(--ease-brutal), background-color 0.2s var(--ease-brutal);
+}
+
+.search-btn:hover { transform: scale(1.06); }
+.search-btn:active { transform: scale(0.96); }
+
+/* ── Hero readout ───────────────────────────────────────────────────────────
+   Reserves its own height so tags appearing never shift the hero. Uses the
+   Courier voice this page already speaks in for machine output — the HUD
+   panel headers, the canvas labels and the footer status line are all set
+   this way, so the readout reads as the same system talking, not a new one.
+   ────────────────────────────────────────────────────────────────────────── */
+.hero-readout {
+    min-height: 2.25rem;
+    margin-top: 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.readout-examples,
+.readout-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.readout-examples[hidden],
+.readout-tags[hidden] { display: none; }
+
+.readout-lead,
+.readout-tag-label {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+.bg-black .readout-lead,
+.bg-black .readout-tag-label { color: #FFFFFF; }
+
+/* Examples are real queries, and tapping one fills the field. */
+.readout-example {
+    font-family: inherit;
+    font-size: 0.8rem;
+    line-height: 1;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 2px;
+    background: transparent;
+    color: #FFFFFF;
+    opacity: 0.75;
+    cursor: pointer;
+    transition: opacity 0.2s var(--ease-brutal),
+                border-color 0.2s var(--ease-brutal),
+                background-color 0.2s var(--ease-brutal);
+}
+
+.readout-example:hover,
+.readout-example:focus-visible {
+    opacity: 1;
+    border-color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* A recognised field. Label in the machine voice, value in the page's voice. */
+.readout-tag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    /* Snaps in rather than drifting — the same hard easing the rest of the
+       page moves with. */
+    animation: readout-snap 0.22s var(--ease-brutal) both;
+}
+
+.readout-tag-value {
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1;
+    color: #FFFFFF;
+}
+
+@keyframes readout-snap {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .hero-readout { min-height: 3.6rem; }
+    .readout-example { font-size: 0.74rem; }
+    /* Two fit on one line here; the third wrapped alone and looked stranded.
+       It is only ever a shortcut, so dropping it costs nothing. */
+    .readout-example:nth-of-type(3) { display: none; }
+}
 
 .search-btn {
     border: none;
