@@ -595,7 +595,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 800);
 
     // 8. Fixed-Perspective Neural Pulse — 3D network inside UAE silhouette
+    //
+    // three.js is 118 KB and was measured at 1587 ms on Slow 4G — 44% of the
+    // page's bytes — fetched immediately at load for a decorative map that sits
+    // about four screens down and that most visitors never scroll to. Together
+    // with uae-paths.js (14 KB, used only here) it is now fetched on approach
+    // instead, so it costs nothing on first paint.
+    //
+    // The body below is unchanged; it simply runs once the library has arrived.
     const canvas = document.getElementById('pixel-map');
+
+    const loadScriptOnce = (src) => new Promise((resolve, reject) => {
+        if (document.querySelector(`script[data-lazy="${src}"]`)) return resolve();
+        const el = document.createElement('script');
+        el.src = src;
+        el.async = true;
+        el.dataset.lazy = src;
+        el.onload = () => resolve();
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+    });
+
+    function initPixelMap() {
     if (canvas && typeof THREE !== 'undefined' && typeof UAE_PATHS !== 'undefined') {
         const container = canvas.parentElement;
         
@@ -1157,11 +1178,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { threshold: 0.2 });
         mapObserver.observe(canvas);
     }
+    }
+
+    // Fetch the map's libraries when the section is within ~600px of the
+    // viewport, so they are usually there by the time it scrolls in. If either
+    // request fails the guard inside initPixelMap simply declines to run and
+    // the rest of the page is unaffected — the canvas is decorative.
+    if (canvas) {
+        const mapSection = document.getElementById('intelligence-network') || canvas;
+        const mapLoader = new IntersectionObserver((entries) => {
+            if (!entries.some((e) => e.isIntersecting)) return;
+            mapLoader.disconnect();
+            Promise.all([
+                loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'),
+                loadScriptOnce('uae-paths.js'),
+            ])
+                .then(initPixelMap)
+                .catch((err) => console.warn('[map] skipped:', err.message));
+        }, { rootMargin: '600px 0px' });
+        mapLoader.observe(mapSection);
+    }
 
     // 9. Supabase Waitlist Integration
     // Credentials are declared once at the top, alongside the funnel sink.
-    const supabaseUrl = SUPABASE_URL;
-    const supabaseAnonKey = SUPABASE_ANON_KEY;
+    // (SUPABASE_URL / SUPABASE_ANON_KEY are declared at the top of this file and
+    // used directly by both the funnel sink and the waitlist insert.)
     
     const waitlistForm = document.querySelector('.waitlist-form');
 
@@ -1252,31 +1293,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // If the Supabase CDN script was blocked, the old code attached no
             // handler at all and the form did a native GET, putting the address
-            // in the URL bar. Fail loudly instead.
-            if (typeof supabase === 'undefined') {
-                restore();
-                showError("We couldn't reach the signup service. Please try again in a moment.");
-                trackEvent('waitlist_error', { code: 'sdk_unavailable' });
-                return;
-            }
-
-            const db = supabase.createClient(supabaseUrl, supabaseAnonKey);
-
             const row = { email };
             if (persona) row.persona = persona;
             if (emirate) row.emirate = emirate;
             if (pendingHeroQuery) row.first_query = pendingHeroQuery.slice(0, 200);
 
-            const { error } = await db.from('waitlist').insert([row]);
-
-            // 23505 = unique violation, i.e. already signed up. That is a success
-            // from the visitor's point of view, so treat it as one. Everything
-            // else is a real failure and must be surfaced, not swallowed.
-            if (error && error.code !== '23505') {
+            // Plain fetch against PostgREST rather than the Supabase SDK. The SDK
+            // was 54 KB and a measured 1044 ms on Slow 4G to perform this one
+            // INSERT — 20% of the page's bytes for a single request. trackEvent()
+            // above already talks to /rest/v1 this way; this is the same shape.
+            let res;
+            try {
+                res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(row)
+                });
+            } catch (networkError) {
+                // Previously this branch caught "the SDK script was blocked". The
+                // failure it really guards against is the request not completing,
+                // which is what this now detects directly.
                 restore();
+                showError("We couldn't reach the signup service. Please try again in a moment.");
+                trackEvent('waitlist_error', { code: 'network_error' });
+                console.error('[waitlist] request failed:', networkError);
+                return;
+            }
+
+            // 409 is PostgREST's unique violation (Postgres 23505) — already signed
+            // up, which is a success from the visitor's point of view. Anything
+            // else that is not 2xx is a real failure and must be surfaced.
+            if (!res.ok && res.status !== 409) {
+                restore();
+                let code = String(res.status);
+                try {
+                    const body = await res.json();
+                    if (body && body.code) code = body.code;
+                    console.error('[waitlist] insert failed:', res.status, body);
+                } catch (_) {
+                    console.error('[waitlist] insert failed:', res.status);
+                }
                 showError("That didn't go through. Please try again.");
-                trackEvent('waitlist_error', { code: error.code || 'unknown' });
-                console.error('[waitlist] insert failed:', error);
+                trackEvent('waitlist_error', { code });
                 return;
             }
 
