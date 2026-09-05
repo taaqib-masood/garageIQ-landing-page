@@ -645,6 +645,29 @@ document.addEventListener('DOMContentLoaded', () => {
             heroSearchForm.classList.toggle('has-input', heroSearchInput.value.trim() !== '');
             renderReadout(heroSearchInput.value);
         });
+
+        // Emptying the field previously meant holding backspace.
+        const clearBtn = document.getElementById('hero-search-clear');
+        const clearSearch = () => {
+            heroSearchInput.value = '';
+            heroSearchForm.classList.remove('has-input');
+            renderReadout('');
+            pendingHeroQuery = '';
+            if (heroSearchNote) {
+                heroSearchNote.textContent =
+                    "Search goes live at launch — tell us what you'd look for and we'll notify you.";
+                heroSearchNote.classList.remove('is-confirmed');
+            }
+            heroSearchInput.focus();
+        };
+        clearBtn?.addEventListener('click', clearSearch);
+        // Escape is what people press to clear a search field.
+        heroSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && heroSearchInput.value) {
+                e.preventDefault();
+                clearSearch();
+            }
+        });
     }
 
     if (heroSearchForm) {
@@ -1351,6 +1374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         emailInput?.addEventListener('focus', () => trackEvent('waitlist_focus'), { once: true });
 
+
         // Remember the emirate across visits. Small thing, but this is the one
         // field a returning visitor would otherwise re-pick every time.
         try {
@@ -1371,20 +1395,124 @@ document.addEventListener('DOMContentLoaded', () => {
             errorEl.hidden = false;
         };
 
-        const renderSuccess = () => {
-            waitlistForm.classList.add('is-success');
-            waitlistForm.innerHTML = `
-                <div class="waitlist-success" role="status" aria-live="polite">
-                    <div class="waitlist-success-inner">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" style="margin: 0 auto 12px auto; display: block;" aria-hidden="true">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <h3 class="mt-2" style="font-size: 1.5rem;">You're on the list!</h3>
-                        <p class="waitlist-microcopy mt-2">We'll notify you at launch.</p>
-                    </div>
-                </div>
-            `;
+        // Remembering the signup is what makes a return visit make sense. Without
+        // it a visitor who already joined comes back to an empty form with no
+        // acknowledgement, and either signs up again or assumes it failed.
+        const SIGNED_UP_KEY = 'giq_waitlist_email';
+
+        const readSignedUp = () => {
+            try { return localStorage.getItem(SIGNED_UP_KEY); } catch (_) { return null; }
         };
+
+        /**
+         * The success state used to be a full stop: a tick, "You're on the list",
+         * and nothing to do. It is the moment of most goodwill on the page, and
+         * three things were missing — the address back (so a typo is visible),
+         * a way to fix that typo, and something to actually do next.
+         *
+         * Built with DOM methods rather than an innerHTML template because the
+         * email is user input and gets echoed back here.
+         */
+        const renderSuccess = (email, { returning = false } = {}) => {
+            waitlistForm.classList.add('is-success');
+            waitlistForm.replaceChildren();
+
+            const wrap = document.createElement('div');
+            wrap.className = 'waitlist-success';
+            wrap.setAttribute('role', 'status');
+            wrap.setAttribute('aria-live', 'polite');
+            // Focus lands here after submitting. Previously focus fell back to
+            // <body>, which drops a keyboard or screen-reader user out of the
+            // flow entirely at the one moment they need confirming.
+            wrap.tabIndex = -1;
+
+            const inner = document.createElement('div');
+            inner.className = 'waitlist-success-inner';
+
+            const tick = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            tick.setAttribute('viewBox', '0 0 24 24');
+            tick.setAttribute('width', '32'); tick.setAttribute('height', '32');
+            tick.setAttribute('fill', 'none'); tick.setAttribute('stroke', '#FFFFFF');
+            tick.setAttribute('stroke-width', '2'); tick.setAttribute('aria-hidden', 'true');
+            tick.style.cssText = 'margin: 0 auto 12px auto; display: block;';
+            const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            poly.setAttribute('points', '20 6 9 17 4 12');
+            tick.append(poly);
+
+            const h = document.createElement('h3');
+            h.className = 'mt-2';
+            h.style.fontSize = '1.5rem';
+            h.textContent = returning ? "You're already on the list." : "You're on the list!";
+
+            const sub = document.createElement('p');
+            sub.className = 'waitlist-microcopy mt-2';
+            sub.append(document.createTextNode("We'll email "));
+            const strong = document.createElement('strong');
+            strong.className = 'waitlist-success-email';
+            strong.textContent = email;                    // user input — textContent
+            sub.append(strong, document.createTextNode(' when we launch.'));
+
+            const actions = document.createElement('div');
+            actions.className = 'waitlist-success-actions';
+
+            // Somewhere to go next. Web Share where it exists (this is a phone
+            // audience), copy the link otherwise.
+            const share = document.createElement('button');
+            share.type = 'button';
+            share.className = 'waitlist-success-action';
+            share.textContent = navigator.share ? 'Share GarageIQ' : 'Copy link';
+            share.addEventListener('click', async () => {
+                const url = 'https://www.garageiq.ae/';
+                const data = { title: 'GarageIQ',
+                               text: 'Find the right garage in the UAE, not just a nearby one.',
+                               url };
+                try {
+                    if (navigator.share) {
+                        await navigator.share(data);
+                        trackEvent('share_used', { method: 'web_share' });
+                    } else {
+                        await navigator.clipboard.writeText(url);
+                        share.textContent = 'Link copied';
+                        trackEvent('share_used', { method: 'clipboard' });
+                        setTimeout(() => { share.textContent = 'Copy link'; }, 2200);
+                    }
+                } catch (_) {
+                    /* dismissed the share sheet, or clipboard denied — not an error */
+                }
+            });
+
+            // A mistyped address is otherwise unrecoverable: the form is gone.
+            const fix = document.createElement('button');
+            fix.type = 'button';
+            fix.className = 'waitlist-success-action is-quiet';
+            fix.textContent = 'Use a different email';
+            fix.addEventListener('click', () => {
+                try { localStorage.removeItem(SIGNED_UP_KEY); } catch (_) {}
+                trackEvent('waitlist_edit_email');
+                window.location.reload();
+            });
+
+            actions.append(share, fix);
+            inner.append(tick, h, sub, actions);
+            wrap.append(inner);
+            waitlistForm.append(wrap);
+
+            wrap.focus({ preventScroll: true });
+        };
+
+        // Someone who already joined should be told so, not shown an empty form.
+        // Placed after every declaration it touches: an earlier attempt put this
+        // above `const readSignedUp` and the temporal dead zone threw, killing
+        // the rest of this handler — including the submit listener below, so the
+        // form silently stopped working.
+        //
+        // No focus grab here. Nothing has just happened; stealing focus on load
+        // would be hostile.
+        const alreadySignedUp = readSignedUp();
+        if (alreadySignedUp) {
+            renderSuccess(alreadySignedUp, { returning: true });
+            document.querySelector('.waitlist-success')?.blur();
+        }
 
         waitlistForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1471,7 +1599,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 emirate: emirate || 'unspecified',
                 from_search: pendingHeroQuery ? 'yes' : 'no'
             });
-            renderSuccess();
+            try { localStorage.setItem(SIGNED_UP_KEY, email); } catch (_) {}
+            renderSuccess(email);
         });
     }
 

@@ -8,6 +8,9 @@
          number in a meta description is invisible until someone checks it. -->
     <meta name="description" content="Stop guessing between 4.5 stars. Start knowing. GarageIQ reads the reviews behind the rating to find the right UAE garage for your exact car problem.">
     <link rel="canonical" href="https://www.garageiq.ae/">
+    <!-- Without this the phone's address bar stays light grey above a black page,
+         which reads as an unfinished site before a word is read. -->
+    <meta name="theme-color" content="#0A0A0A">
 
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website">
@@ -40,7 +43,7 @@
          Warming the connection now means the download starts on arrival rather
          than after a DNS + TLS handshake. Costs one connection, no bytes. -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260904-phone">
+    <link rel="stylesheet" href="style.css?v=20260905-ux">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -153,8 +156,13 @@
             <form class="mockup-search interactive-cta" id="hero-search" role="search">
                 <label for="hero-search-input" class="visually-hidden">Describe your car problem</label>
                 <input type="text" id="hero-search-input" class="search-input" autocomplete="off"
-                       maxlength="120" aria-describedby="hero-search-note">
+                       maxlength="120" aria-describedby="hero-search-note"
+                       autocapitalize="off" autocorrect="off" spellcheck="false"
+                       enterkeyhint="search">
                 <span class="cli-cursor" aria-hidden="true"></span>
+                <button type="button" class="search-clear" id="hero-search-clear" aria-label="Clear search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
                 <button type="submit" class="search-btn" aria-label="Search garages">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </button>
@@ -652,7 +660,9 @@
                     <div class="waitlist-input-group">
                         <label for="waitlist-email" class="visually-hidden">Your email address</label>
                         <input type="email" id="waitlist-email" name="email" placeholder="Your email address"
-                               class="waitlist-input interactive-cta" autocomplete="email" required>
+                               class="waitlist-input interactive-cta" autocomplete="email" required
+                               inputmode="email" autocapitalize="off" autocorrect="off"
+                               spellcheck="false" enterkeyhint="go">
                         <label for="waitlist-emirate" class="visually-hidden">Your emirate</label>
                         <select id="waitlist-emirate" name="emirate" class="waitlist-select interactive-cta">
                             <option value="">Emirate (optional)</option>
@@ -867,7 +877,7 @@
       viewport. Between them these were 64% of the page's bytes, none of it
       needed for first paint.
     -->
-    <script src="main.js?v=20260904-phone"></script>
+    <script src="main.js?v=20260905-ux"></script>
     
     <!--
       Vercel Analytics.
