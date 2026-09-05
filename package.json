@@ -1,13 +1,8 @@
 {
-  "name": "garageiq",
+  "name": "garageiq-landing-page",
   "private": true,
+  "description": "Static marketing site for GarageIQ. Everything shipped lives in public/; vercel.json copies it to the build output. No build step and no dependencies.",
   "scripts": {
-    "dev": "npm run dev --workspace=apps/web",
-    "build": "echo 'Static landing page deployment. Bypassing Next.js workspace build.'",
-    "lint": "npm run lint --workspaces"
-  },
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+    "dev": "python3 -m http.server 8000 --directory public"
+  }
 }
