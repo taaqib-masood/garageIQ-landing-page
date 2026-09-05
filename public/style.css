@@ -725,6 +725,28 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .waitlist-error[hidden] { display: none; }
 
 /* CLI Typewriter & Live Strip */
+/*
+ * The counters animate 0 -> 8,083 and 0 -> 505,453. Every digit added made the
+ * line longer, and at phone widths the sentence flipped from one line to two
+ * partway through the count — the strip grew 21px and shoved the subheadline,
+ * the Join Early Access button and the search field down with it. Measured
+ * CLS 0.078, and the button visibly jumping under the reader's thumb.
+ *
+ * Fixed by reserving each number's final width up front. tabular-nums makes
+ * every digit the same advance so the reserved box is exact and the digits
+ * stop jittering as they climb; the widths cover "8,083" and "505,453".
+ * Nothing reflows now — the strip is two lines from the first frame.
+ */
+.live-data-strip #garage-count,
+.live-data-strip #review-count {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.live-data-strip #garage-count { min-width: 5ch; }
+.live-data-strip #review-count { min-width: 7ch; }
+
 .live-data-strip {
     font-size: 0.875rem;
     color: var(--text-color);
@@ -2746,4 +2768,111 @@ select:focus-visible,
 .bg-black input:focus-visible,
 .bg-black select:focus-visible {
     outline-color: #FFFFFF;
+}
+
+/* ── Text selection ─────────────────────────────────────────────────────────
+   The browser default is a blue wash, which on a page this committed to black
+   and white looks like someone else's UI leaking through. Inverted instead,
+   matching the difference-blend cursor the page already uses.
+   ────────────────────────────────────────────────────────────────────────── */
+::selection {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.bg-black ::selection {
+    background: #FFFFFF;
+    color: var(--text-color);
+}
+
+/* ── Waitlist success ───────────────────────────────────────────────────────
+   Was a dead end: a tick and a sentence. It is the moment of most goodwill on
+   the page, so it now shows the address back (a typo is otherwise invisible
+   and unrecoverable) and offers something to do.
+   ────────────────────────────────────────────────────────────────────────── */
+.waitlist-success:focus { outline: none; }
+
+.waitlist-success:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 6px;
+}
+
+.waitlist-success-email {
+    font-weight: 600;
+    color: #FFFFFF;
+    /* Long addresses must not push the panel wider than the column. */
+    overflow-wrap: anywhere;
+}
+
+.waitlist-success-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.4rem;
+}
+
+.waitlist-success-action {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.75rem 1.2rem;
+    min-height: 44px;
+    border: 1px solid #FFFFFF;
+    border-radius: 100px;
+    background: #FFFFFF;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.2s var(--ease-brutal), color 0.2s var(--ease-brutal);
+}
+
+/* Secondary: the escape hatch, not the invitation. */
+.waitlist-success-action.is-quiet {
+    background: transparent;
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.waitlist-success-action:hover,
+.waitlist-success-action:focus-visible {
+    background: transparent;
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+.waitlist-success-action.is-quiet:hover,
+.waitlist-success-action.is-quiet:focus-visible {
+    background: #FFFFFF;
+    color: var(--text-color);
+}
+
+/* ── Clear the search ───────────────────────────────────────────────────────
+   A typed query could only be emptied with the backspace key. Appears only
+   once there is something to clear.
+   ────────────────────────────────────────────────────────────────────────── */
+.search-clear {
+    display: none;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    margin-right: 0.35rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.2s var(--ease-brutal);
+}
+
+.mockup-search.has-input .search-clear { display: inline-flex; align-items: center; justify-content: center; }
+.search-clear:hover, .search-clear:focus-visible { opacity: 1; }
+.bg-black .search-clear { color: #FFFFFF; }
+
+.search-clear svg {
+    width: 15px; height: 15px;
+    fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round;
 }
