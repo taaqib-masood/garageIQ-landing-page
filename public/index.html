@@ -43,7 +43,7 @@
          Warming the connection now means the download starts on arrival rather
          than after a DNS + TLS handshake. Costs one connection, no bytes. -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260905-ux">
+    <link rel="stylesheet" href="style.css?v=20260905-legal">
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -703,18 +703,18 @@
                      headline. This is a wordmark, not a heading. -->
                 <div class="monolith-wordmark"><span>GarageIQ</span></div>
                 <!--
-                  ABOUT US / CONTACT US / INSTAGRAM / LINKEDIN removed 2026-09-03.
+                  ABOUT US / CONTACT US / INSTAGRAM / LINKEDIN were removed 2026-09-03
+                  because all four were href="#" and went nowhere.
 
-                  All four were href="#" — they went nowhere. Dead links read as an
-                  unfinished site to a visitor and as low quality to a crawler, and
-                  there are no real destinations to point them at yet (the Terms of
-                  Use dialog still has [SUPPORT EMAIL] and [FULL LEGAL ENTITY NAME]
-                  unfilled).
-
-                  Restore each one as its destination becomes real, not before.
+                  CONTACT restored 2026-09-05: support@garageiq.ae is live, so it now
+                  has a real destination. The rest stay out until theirs do — a link
+                  to nothing reads as an unfinished site to a visitor and as low
+                  quality to a crawler.
                 -->
                 <div class="footer-links mt-8">
-                    <a href="#terms-of-use" class="interactive-text" data-open-terms>TERMS OF USE</a>
+                    <a href="#terms-of-use" class="interactive-text" data-open-terms>HOW THIS PAGE WORKS</a>
+                    <span class="dot-separator">&middot;</span>
+                    <a href="mailto:support@garageiq.ae" class="interactive-text">CONTACT</a>
                     <span class="dot-separator">&middot;</span>
                     <a href="#waitlist" class="interactive-text">GET EARLY ACCESS</a>
                 </div>
@@ -733,134 +733,80 @@
     <dialog id="terms-of-use" class="legal-dialog" aria-labelledby="terms-title">
         <div class="legal-dialog-header">
             <div>
-                <span class="legal-dialog-kicker">GARAGEIQ / LEGAL</span>
-                <h2 id="terms-title">Terms of Use</h2>
+                <span class="legal-dialog-kicker">GARAGEIQ / PRE-LAUNCH</span>
+                <h2 id="terms-title">How this page works</h2>
             </div>
-            <button type="button" class="legal-dialog-close interactive-cta" data-close-terms aria-label="Close Terms of Use">CLOSE</button>
+            <button type="button" class="legal-dialog-close interactive-cta" data-close-terms aria-label="Close">CLOSE</button>
         </div>
 
         <div class="legal-dialog-scroll">
             <article class="legal-copy">
                 <div class="legal-draft-notice">
-                    <strong>Status:</strong> Publication draft — operator details and UAE legal review required<br>
-                    <strong>Effective date:</strong> <mark>[COMPLETE BEFORE LAUNCH: DATE]</mark><br>
-                    <strong>Last updated:</strong> 11 August 2026
+                    <strong>Last updated:</strong> 5 September 2026<br>
+                    GarageIQ has not launched. This page collects an email address so we can
+                    tell you when it does, and nothing else. Everything below describes what
+                    actually happens when you use it.
                 </div>
 
-                <p>These Terms of Use (“Terms”) govern the GarageIQ website, progressive web application, related pages, communications and services (together, the “Service”). The Service is operated by <mark>[COMPLETE BEFORE LAUNCH: FULL UAE LEGAL ENTITY NAME, LEGAL FORM]</mark>, licensed by <mark>[LICENSING AUTHORITY]</mark> under licence number <mark>[LICENCE NUMBER]</mark>, with registered address at <mark>[REGISTERED ADDRESS]</mark> (“GarageIQ”, “we”, “us” or “our”).</p>
-                <p>Please read these Terms, the Privacy Policy, AI and Automotive Information Notice, Cookie and Device Storage Notice, and Content, Review, Correction and Takedown Policy. If you create an account, submit content, claim a garage, or otherwise select an acceptance control, you agree to these Terms. If you do not agree, do not create an account or use those features.</p>
-                <p>Nothing in these Terms excludes or limits a right or remedy that cannot lawfully be excluded under applicable UAE law.</p>
+                <h3>What we collect</h3>
+                <p>When you join the early-access list we store your email address, whether
+                you said you drive a car or own a garage, and — if you chose one — your
+                emirate. If you typed something into the search box before signing up, we
+                store that text too, because knowing what people are looking for before we
+                launch is genuinely useful to us. Nothing else is collected, and nothing is
+                required beyond the email address.</p>
 
-                <h3>1. What GarageIQ does</h3>
-                <p>GarageIQ is an information and discovery service for automotive garages in the UAE. It may provide garage profiles, search and comparison features, user reviews, evidence indicators, AI-assisted summaries, typical price information, quote-message tools, and links that open telephone, WhatsApp, maps or other third-party services.</p>
-                <p>Unless a feature and separate written terms expressly say otherwise:</p>
-                <ul>
-                    <li>GarageIQ is not a garage, mechanic, vehicle inspector, insurer, broker, agent or repair provider;</li>
-                    <li>GarageIQ does not diagnose vehicles, certify that a vehicle is safe to drive, supervise repairs or guarantee a garage;</li>
-                    <li>GarageIQ is not a party to the repair, quote, booking, payment or other agreement between a user and a garage;</li>
-                    <li>GarageIQ does not collect repair payments or hold money in escrow; and</li>
-                    <li>garages are independent businesses, not GarageIQ employees or representatives.</li>
-                </ul>
-                <p>Contacting a garage through a telephone or WhatsApp link takes the user to a third-party communication service. A garage's response, quote, availability and performance are its responsibility.</p>
+                <h3>Anonymous usage</h3>
+                <p>We record which parts of this page get used — that the signup form was
+                reached, focused, submitted, and whether it succeeded — along with a random
+                per-tab identifier and the domain that referred you. These records contain
+                no name, no email address and no IP address, and cannot be traced back to
+                your signup.</p>
 
-                <h3>2. Eligibility and accounts</h3>
-                <p>You must be at least 18 years old and have legal capacity to enter a binding agreement to create an account, submit a review, claim a garage or use a contracting feature. People under 18 may not create an account or submit content.</p>
-                <p>You must provide accurate information, keep access to your email and account secure, and promptly notify <mark>[SUPPORT EMAIL]</mark> of suspected unauthorized activity. You are responsible for activity performed through your account except to the extent caused by GarageIQ's breach of law or failure to use legally required care.</p>
-                <p>We may require reasonable identity or authority checks, particularly when a person claims a business listing or asks to change or remove business information.</p>
+                <h3>Where it goes</h3>
+                <p>Your details are stored in our database, hosted by Supabase in Sydney,
+                Australia. Your data therefore leaves the UAE. The key this page uses can
+                only add rows — it cannot read them back — so the signup list cannot be
+                retrieved from your browser or by anyone inspecting this page's code.</p>
 
-                <h3>3. Informational scores, rankings and price information</h3>
-                <p>GarageIQ may organize review and business evidence into trust, speed, price, specialty, service-match, confidence or similar indicators. These are analytical opinions based on the evidence and methodology available at the stated time. They are not certifications, guarantees, inspection findings, warranties, or promises of future performance.</p>
-                <p>Typical price ranges and “above,” “within,” or “below” range indicators are market information, not a quote from a particular garage. Prices can vary with diagnosis, vehicle specification, parts, labour, tax, location and the scope of work. Obtain an itemized written quote directly from a garage before authorizing work.</p>
-                <p>Search order may consider relevance, service/brand match, evidence-based quality, location, price fit, evidence confidence, recency, speed, popularity and user preferences. We will identify paid advertisements or sponsored placements clearly. <strong>Payment does not change organic trust scores or organic ranking unless we expressly disclose a different product and the sponsored nature of that placement at the point of display.</strong> Verification status may be used as a display or typeahead factor only as described in the Service; a badge does not certify workmanship.</p>
-                <p>See the AI and Automotive Information Notice for further limitations.</p>
+                <h3>What we do not do</h3>
+                <p>There are no accounts and no payments. We do not sell, rent or share the
+                list. We do not run advertising or advertising trackers. We do not build a
+                profile of you beyond the few fields above.</p>
 
-                <h3>4. Automotive safety</h3>
-                <p>Do not use GarageIQ as the sole basis for deciding whether a vehicle is safe to drive. If a vehicle has braking, steering, tyre, overheating, fuel, smoke, electrical, airbag, severe warning-light, accident-damage or other potentially dangerous symptoms, stop using the vehicle when safe to do so and seek qualified professional or emergency assistance. GarageIQ does not provide emergency services.</p>
+                <h3>Stored on your device</h3>
+                <p>Your browser keeps your email address after you sign up, so returning
+                here shows an acknowledgement instead of an empty form; the emirate you
+                picked, so you need not pick it twice; and a per-tab identifier used only to
+                join the anonymous usage records above. Clearing your site data removes all
+                three, and the page still works without them.</p>
 
-                <h3>5. Garage information and third-party sources</h3>
-                <p>Garage profiles may include information supplied by garages, users, public authorities and lawfully used third-party sources. Information may be incomplete, incorrectly matched or outdated. Confirm critical information—including identity, trade licence, address, opening hours, qualifications, availability and price—directly with the garage.</p>
-                <p>GarageIQ will use third-party content only where we reasonably believe we have a lawful and contractual right to do so. The presence of a source label or link does not mean that the source endorses GarageIQ.</p>
-                <p>Where the Service includes Google Maps features or content, use of those features and content is also subject to the current <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps/Google Earth Additional Terms</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>. Google and Google Maps are trademarks of Google LLC; GarageIQ is not affiliated with or endorsed by Google.</p>
-                <p>Third-party links and services, including Google Maps and WhatsApp, operate under their own terms and privacy practices. GarageIQ is not responsible for their availability or conduct.</p>
+                <h3>Other services this page uses</h3>
+                <p>The site is hosted by Vercel. The 3D map further down the page loads a
+                graphics library from cdnjs, and only if you scroll far enough to reach it.
+                Both may see your IP address as a normal part of serving a request.</p>
 
-                <h3>6. User content</h3>
-                <p>“User Content” includes reviews, ratings, photos, reports, corrections, business responses and other material you submit.</p>
-                <p>You retain ownership of your User Content. You grant GarageIQ a non-exclusive, worldwide, royalty-free, sublicensable licence for the period the content is hosted, plus a reasonable backup and legal-preservation period, to host, reproduce, format, translate, moderate, display and distribute it only to operate, secure, improve and promote the Service. Promotional use of an identifiable review outside the Service requires separate permission unless it is a brief, attributed Service preview reasonably expected from publication.</p>
-                <p>You represent that:</p>
-                <ul>
-                    <li>the content is based on a genuine, first-hand experience or facts you are authorized to provide;</li>
-                    <li>it is accurate to the best of your knowledge and distinguishes opinion from fact;</li>
-                    <li>you own it or have all necessary rights and consents, including for every identifiable person, photo and document;</li>
-                    <li>it does not disclose private, confidential, personal, medical or financial information without lawful authority;</li>
-                    <li>it is not defamatory, threatening, hateful, obscene, misleading, fraudulent or unlawful; and</li>
-                    <li>it was not submitted in return for an undisclosed incentive and does not manipulate ratings.</li>
-                </ul>
-                <p>Submitting a review does not guarantee publication. We may screen, delay, refuse, restrict, annotate or remove content under the Content, Review, Correction and Takedown Policy. We may preserve content and decision records where reasonably necessary for complaints, legal claims or lawful authority requests.</p>
-                <p>You can request deletion of your own GarageIQ review. Removal from public display may not require immediate deletion from legally required evidence, backups or security records.</p>
+                <h3>Removing yourself</h3>
+                <p>Email <a href="mailto:privacy@garageiq.ae">privacy@garageiq.ae</a> and we
+                will delete your row. We do not require a reason and there is no form to
+                fill in. You can also simply ignore the launch email when it arrives.</p>
 
-                <h3>7. Prohibited conduct</h3>
-                <p>You must not:</p>
-                <ul>
-                    <li>break UAE law or the rights of another person;</li>
-                    <li>scrape, harvest, systematically extract or rehost the Service or its database without written permission;</li>
-                    <li>bypass access controls, probe security, overload the Service, upload malware or interfere with operation;</li>
-                    <li>impersonate a person or business, falsely claim a listing, submit forged evidence or misuse verification;</li>
-                    <li>submit fake, duplicate, coordinated, competitor, employee or conflict-of-interest reviews without clear disclosure;</li>
-                    <li>threaten a garage or user, demand value in return for changing a review, or manipulate scores;</li>
-                    <li>use personal data obtained through the Service for unsolicited marketing, harassment or profiling;</li>
-                    <li>reverse engineer the Service except where applicable law expressly permits it; or</li>
-                    <li>use Service output to make a safety-critical decision without qualified professional assessment.</li>
-                </ul>
+                <h3>Accuracy</h3>
+                <p>Figures shown on this page — garages tracked, reviews analysed — come
+                from our own database and are updated manually. The garage intelligence the
+                product is being built to provide does not exist here yet; this page
+                describes an intention, not a service you can currently use.</p>
 
-                <h3>8. Garage claims and badges</h3>
-                <p>A successful listing claim confirms only that GarageIQ completed the specific ownership/contact checks described in the claim flow. It does not certify the garage's trade licence, technicians, equipment, pricing, safety or workmanship unless the badge expressly identifies that separately verified fact and its verification date/expiry.</p>
-                <p>Garage owners must keep their information accurate and must not use access to suppress genuine criticism. Owner-proposed edits may be reviewed before publication. GarageIQ may revoke a claim or badge if verification becomes unreliable, ownership changes, supporting evidence expires, or the account breaches these Terms.</p>
-                <p>Any paid garage product will be governed by separate Garage Partner Terms and a clear order form accepted before charging. No payment term in a dormant or draft policy creates a current paid offering.</p>
+                <h3>Full terms</h3>
+                <p>Proper Terms of Use and a Privacy Policy will be published before launch,
+                once the operating company is registered and the wording has been reviewed
+                by a UAE-qualified lawyer. We would rather show you this short, accurate
+                note now than a long document with blanks in it.</p>
 
-                <h3>9. Intellectual property</h3>
-                <p>The Service software, GarageIQ branding, original text, original methodology and original design are owned by GarageIQ or its licensors. Subject to these Terms, we grant you a limited, revocable, non-transferable, non-exclusive right to use the Service for personal or internal business purposes.</p>
-                <p>Third-party names, reviews, photos, maps and marks remain the property of their respective owners. Nothing in these Terms transfers those rights to GarageIQ or to you.</p>
-                <p>To report copyright or trademark infringement, follow the Content, Review, Correction and Takedown Policy and provide enough information to identify the work, content, right and requested action.</p>
-
-                <h3>10. Privacy</h3>
-                <p>Our Privacy Policy explains the personal data we process, purposes, recipients, international transfers, retention and rights. Do not submit sensitive personal data in search, symptom, review, report or support fields.</p>
-
-                <h3>11. Service availability and changes</h3>
-                <p>The Service may contain errors, interruptions and incomplete coverage, particularly during beta. We may maintain, change, suspend or discontinue features. We will give reasonable notice where a change materially affects an active paid commitment or where law requires notice.</p>
-
-                <h3>12. Disclaimers</h3>
-                <p>To the maximum extent permitted by law, the Service is provided “as available.” GarageIQ does not promise that all information is accurate, complete, current or suitable for a particular repair decision; that a garage will respond; that a quote will be honored; or that the Service will be uninterrupted or error-free.</p>
-                <p>Mandatory statutory warranties and consumer rights remain unaffected.</p>
-
-                <h3>13. Liability</h3>
-                <p>Nothing in these Terms excludes liability for fraud, wilful misconduct, gross negligence, death or personal injury where exclusion is prohibited, breach of mandatory consumer rights, or any other liability that cannot lawfully be excluded.</p>
-                <p>Subject to the previous paragraph and to the maximum extent permitted by applicable law, GarageIQ is not responsible for indirect or consequential loss arising from a garage's acts, an agreement made directly with a garage, reliance on unverified information, or a third-party service.</p>
-                <p>For a free Service, GarageIQ's aggregate liability arising from the Service will not exceed <mark>[COMPLETE BEFORE LAUNCH: COUNSEL-APPROVED AMOUNT AND RATIONALE]</mark>. For a paid GarageIQ service, the relevant order form or partner terms will state the applicable cap. A cap does not reduce mandatory rights.</p>
-
-                <h3>14. Suspension and termination</h3>
-                <p>You may stop using the Service and request account deletion at any time. We may restrict or terminate access where reasonably necessary to protect users, garages, rights holders or the Service; comply with law or authority requests; investigate fraud or security incidents; or enforce these Terms. Where appropriate and lawful, we will explain the reason and provide an appeal route.</p>
-                <p>Terms that by nature survive termination—including intellectual property, preserved evidence, accrued payment obligations, disclaimers, liability and dispute provisions—continue to apply.</p>
-
-                <h3>15. Changes to these Terms</h3>
-                <p>We may update these Terms to reflect law, vendor requirements or Service changes. We will show the updated date and give legally required notice of material changes. If a material change requires fresh consent, continued browsing alone will not be treated as consent; we will request an affirmative acceptance.</p>
-
-                <h3>16. Governing law and disputes</h3>
-                <p>These Terms are governed by <mark>[COMPLETE BEFORE LAUNCH: UAE FEDERAL LAW AND APPLICABLE EMIRATE/FREE-ZONE LAW]</mark>. Subject to mandatory consumer jurisdiction and any competent consumer or digital-commerce dispute process, the courts of <mark>[COMPLETE BEFORE LAUNCH: EMIRATE/JURISDICTION]</mark> have jurisdiction.</p>
-                <p>No pre-dispute arbitration clause applies to a digital contract worth less than AED 50,000. Before filing a claim, please contact us so we can try to resolve it, without delaying any mandatory limitation period or regulatory right.</p>
-
-                <h3>17. Arabic version</h3>
-                <p>An Arabic version must be made available before consumer launch. If there is a conflict in interpreting UAE legislation, the official Arabic law prevails. <mark>[COUNSEL TO CONFIRM CONTRACT-LANGUAGE PRECEDENCE CLAUSE.]</mark></p>
-
-                <h3>18. Contact and complaints</h3>
-                <dl class="legal-contact-list">
-                    <div><dt>Operator</dt><dd>[FULL LEGAL ENTITY NAME]</dd></div>
-                    <div><dt>Licence authority and number</dt><dd>[AUTHORITY / NUMBER]</dd></div>
-                    <div><dt>Registered address</dt><dd>[ADDRESS]</dd></div>
-                    <div><dt>Support and complaints email</dt><dd>[SUPPORT EMAIL]</dd></div>
-                    <div><dt>Privacy email</dt><dd>[PRIVACY EMAIL]</dd></div>
-                    <div><dt>Telephone/WhatsApp</dt><dd>[NUMBER]</dd></div>
-                    <div><dt>Complaint reference/status channel</dt><dd>[URL OR PROCESS]</dd></div>
-                    <div><dt>Normal support hours</dt><dd>[HOURS, UAE TIME]</dd></div>
+                <h3>Contact</h3>
+                <dl class="legal-contact">
+                    <div><dt>General and complaints</dt><dd><a href="mailto:support@garageiq.ae">support@garageiq.ae</a></dd></div>
+                    <div><dt>Privacy and deletion</dt><dd><a href="mailto:privacy@garageiq.ae">privacy@garageiq.ae</a></dd></div>
                 </dl>
             </article>
         </div>
@@ -877,7 +823,7 @@
       viewport. Between them these were 64% of the page's bytes, none of it
       needed for first paint.
     -->
-    <script src="main.js?v=20260905-ux"></script>
+    <script src="main.js?v=20260905-legal"></script>
     
     <!--
       Vercel Analytics.

@@ -67,4 +67,19 @@ phone sits inside a `clip-path` reveal, so element screenshots and same-tick
 Figures on this page have been wrong before. Don't state a garage or review count you
 have not checked against the database, and don't restore the testimonials or the app
 store badges — both were removed for being untrue, with the reasoning left in the
-markup. The Terms of Use dialog still has unfilled `[PLACEHOLDER]` fields; it is live.
+markup.
+
+**The legal copy.** The dialog now serves a short pre-launch notice describing what the
+page actually does — collect an email. It replaced an 18-section commercial Terms of Use
+that had been live with 11 unfilled placeholders; that document is preserved, unrendered,
+at `docs/terms-of-use.draft.md`.
+
+Do **not** fill in its entity or counsel fields to make a placeholder disappear. The
+liability cap and the Arabic precedence clause are marked for counsel by the document's
+own authors, and the trade licence number, licensing authority and registered address are
+registry facts about a company that is not registered yet. Inventing any of them puts a
+false legal claim on a consumer site in a regulated market — the same failure as the
+testimonials and the app-store badges above. Publish it when there is an entity and a
+lawyer has read it, not before.
+
+`support@garageiq.ae` and `privacy@garageiq.ae` are live and safe to use.
