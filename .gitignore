@@ -8,6 +8,8 @@ node_modules/
 dist/
 build/output/
 .DS_Store
+__pycache__/
+*.py[cod]
 
 # Never commit secrets. The app's real config lives in Render/Vercel env vars.
 .env
