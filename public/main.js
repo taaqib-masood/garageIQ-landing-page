@@ -5,11 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // on every submission looked identical to a page nobody scrolled to.
     // These events make the funnel visible: view -> focus -> submit -> result.
     //
-    // Events go to our own Postgres rather than Vercel Web Analytics, which is
-    // not enabled on this project and cannot be switched on through the API.
-    // Owning the data also means the funnel is a SQL query, not a dashboard.
-    // The window.va call is kept as a no-op-safe secondary sink in case Web
-    // Analytics is ever turned on.
+    // Events are sent to the existing first-party endpoint. Its receipt and
+    // authenticated aggregate reporting still need verification; a fetch here
+    // alone cannot prove a stored event. window.va remains a no-op-safe
+    // secondary sink while that integration is unavailable.
     //
     // Deliberately no PII here: emails live in public.waitlist. These rows are
     // anonymous steps stitched together by a per-tab session id.
@@ -29,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
-    // Referrer host only — never the full URL, which can carry query strings.
+    // Observed referrer host only — never a full URL or an inferred channel.
+    // All events on this load keep this same host for session-level reporting.
     const referrerHost = (() => {
         try {
             return document.referrer ? new URL(document.referrer).hostname.slice(0, 255) : null;
@@ -70,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => { /* a dropped analytics beat is not worth a retry */ });
         } catch (_) { /* never break the page for a metric */ }
     }
+
+    trackEvent('landing_view');
 
     // Query typed into the hero search, carried down to the waitlist submit.
     let pendingHeroQuery = '';
@@ -1449,6 +1451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         waitlistForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (btn.disabled) return;
 
             const email = (emailInput?.value || '').trim();
             const persona = waitlistForm.querySelector('input[name="persona"]:checked')?.value || null;
@@ -1467,11 +1470,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const restore = () => {
                 btn.textContent = 'Get Early Access';
+                btn.disabled = false;
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
             };
 
             btn.textContent = 'Joining...';
+            btn.disabled = true;
             btn.style.opacity = '0.7';
             btn.style.pointerEvents = 'none';
 
@@ -1527,13 +1532,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            trackEvent('waitlist_success', {
+            const signupEvent = {
                 persona: persona || 'unknown',
                 emirate: emirate || 'unspecified',
-                from_search: pendingHeroQuery ? 'yes' : 'no'
-            });
+                from_hero_search: pendingHeroQuery ? 'yes' : 'no'
+            };
+            trackEvent('waitlist_success', signupEvent);
+            if (res.ok) trackEvent('waitlist_new_signup', signupEvent);
             try { localStorage.setItem(SIGNED_UP_KEY, email); } catch (_) {}
-            renderSuccess(email);
+            renderSuccess(email, { returning: res.status === 409 });
         });
     }
 
