@@ -255,6 +255,7 @@ async function run({ status = 201, networkError = false, analyticsError = false,
             }
         }
     }
+    scenarios += matrixSessions;
     assert.equal(report.searchViewSessions, 4);
     assert.equal(report.searchDriverConversionSessions, 1);
     assert.equal(report.searchDriverConversionsWithoutMatchingView, 0);
@@ -272,5 +273,5 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         { name: 'waitlist_new_signup', session_id: null, persona: 'driver', referrer: null }
     ]);
     assert.equal(unknownSessionReport.nullSessionEvents, 3, 'null IDs are reported separately, never merged into one visitor');
-    console.log(`PASS: ${scenarios} landing measurement scenarios; all fetches intercepted.`);
+    console.log(`PASS: ${scenarios} landing measurement scenarios and 8 cross-tab cells; all fetches intercepted.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });
