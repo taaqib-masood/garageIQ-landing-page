@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pendingHeroQuery = '';
             if (heroSearchNote) {
                 heroSearchNote.textContent =
-                    "Search goes live at launch — tell us what you'd look for and we'll notify you.";
+                    "Search preview only — no live results. Tell us what you'd look for and join early access.";
                 heroSearchNote.classList.remove('is-confirmed');
             }
             heroSearchInput.focus();
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pendingHeroQuery = query;
                 if (heroSearchNote) {
                     heroSearchNote.textContent =
-                        `We'll look for "${query}" when we launch. Leave your email and we'll tell you what we find.`;
+                        `Search preview: "${query}". No live results yet. Join early access for launch updates.`;
                     heroSearchNote.classList.add('is-confirmed');
                 }
             }
@@ -697,42 +697,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // 7. Live Data Strip Counters
-    const garageCountEl = document.getElementById('garage-count');
-    const reviewCountEl = document.getElementById('review-count');
-    
-    function animateValue(obj, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            
-            // Use brutalist custom ease approximation for counters? EaseOutCubic is fine here.
-            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-            
-            const currentVal = Math.floor(easeOutCubic * (end - start) + start);
-            obj.innerHTML = currentVal.toLocaleString();
-            
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
-        };
-        window.requestAnimationFrame(step);
-    }
-
-    // Live-verified against the GarageIQ DB on 2026-08-13 (docs/36 §1.1):
-    //   8,083   = garages a user can actually find (is_active), not 8,374 total
-    //   505,453 = review rows carrying real written text, of 538,745 stored
-    //
-    // Previously 8,396 and 55,214. The review figure was wrong by a factor of
-    // ten and undersold the single most impressive asset in the product. These
-    // counters are animated in JS, so editing index.html alone leaves the page
-    // still rendering the old numbers — change them here.
-    setTimeout(() => {
-        if(garageCountEl) animateValue(garageCountEl, 0, 8083, 2000);
-        if(reviewCountEl) animateValue(reviewCountEl, 0, 505453, 2500);
-    }, 800);
 
     // 8. Fixed-Perspective Neural Pulse — 3D network inside UAE silhouette
     //
@@ -1278,41 +1242,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        let labelsAnimated = false;
-        function animateLabels() {
-            if (labelsAnimated) return;
-            labelsAnimated = true;
-            
-            const counts = document.querySelectorAll('.e-count');
-            
-            const countUp = (el) => {
-                const target = parseInt(el.getAttribute('data-val'), 10);
-                const duration = 500;
-                const start = performance.now();
-                const step = (timestamp) => {
-                    const progress = Math.min((timestamp - start) / duration, 1);
-                    const current = Math.floor(target * monolithEase(progress));
-                    el.textContent = current.toLocaleString();
-                    if (progress < 1) {
-                        requestAnimationFrame(step);
-                    } else {
-                        el.textContent = target.toLocaleString();
-                    }
-                };
-                requestAnimationFrame(step);
-            };
-
-            // Trigger count-up staggered with the row slide-ins
-            setTimeout(() => {
-                counts.forEach((c, idx) => setTimeout(() => countUp(c), idx * 50));
-            }, 1600);
-        }
-
         const mapObserver = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
                 mapVisible = true;
                 startTime = performance.now();
-                animateLabels();
                 mapObserver.disconnect();
             }
         }, { threshold: 0.2 });
@@ -1464,7 +1397,7 @@ document.addEventListener('DOMContentLoaded', () => {
             share.addEventListener('click', async () => {
                 const url = 'https://www.garageiq.ae/';
                 const data = { title: 'GarageIQ',
-                               text: 'Find the right garage in the UAE, not just a nearby one.',
+                               text: 'GarageIQ is building UAE garage discovery and review intelligence. Join early access.',
                                url };
                 try {
                     if (navigator.share) {
