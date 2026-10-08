@@ -68,7 +68,12 @@ Run `node docs/seo/check-measurement.cjs`. It executes the complete script in a
 Node VM, with all requests intercepted and no production entries. Its scenarios
 cover 200/201, duplicate 409, invalid email, API/network failure, failed analytics,
 denied storage, search/other/missing/malformed referrers, driver/owner/unknown
-personas, returning visitors and repeated submissions during one request.
+personas, returning visitors and repeated submissions during one request. It
+also checks exact search-host classification and all eight search/non-search ×
+driver/owner × new/duplicate report cells. The report check requires a
+`waitlist_new_signup` session to match a `landing_view` with the same session ID
+and search classification before counting it as a search conversion; unmatched
+conversions and null-session events remain separately visible.
 Run `python3 scripts/seo_check.py --json` for read-only landing checks.
 
 On 6 October 2026, a fresh isolated headless Chromium check passed 11 scenarios,

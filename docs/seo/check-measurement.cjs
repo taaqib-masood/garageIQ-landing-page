@@ -6,6 +6,65 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const script = fs.readFileSync(path.join(__dirname, '../../public/main.js'), 'utf8');
+const SEARCH_HOSTS = new Set([
+    'google.com', 'www.google.com', 'google.ae', 'www.google.ae',
+    'bing.com', 'www.bing.com', 'duckduckgo.com', 'www.duckduckgo.com'
+]);
+
+function referralClass(host) {
+    if (typeof host !== 'string' || !host) return 'unknown';
+    return SEARCH_HOSTS.has(host.toLowerCase()) ? 'search' : 'nonsearch';
+}
+
+function summarizeMeasurement(events) {
+    const views = events.filter(event => event.name === 'landing_view');
+    const successes = events.filter(event => event.name === 'waitlist_success');
+    const newSignups = events.filter(event => event.name === 'waitlist_new_signup');
+    const keyOf = event => [event.session_id, referralClass(event.referrer), event.persona || 'unknown'].join('\u0000');
+    const viewSessions = new Set(views.filter(event => event.session_id).map(event =>
+        `${event.session_id}\u0000${referralClass(event.referrer)}`));
+    const successCounts = new Map();
+    const newCounts = new Map();
+    for (const event of successes) {
+        if (event.session_id) successCounts.set(keyOf(event), (successCounts.get(keyOf(event)) || 0) + 1);
+    }
+    for (const event of newSignups) {
+        if (event.session_id) newCounts.set(keyOf(event), (newCounts.get(keyOf(event)) || 0) + 1);
+    }
+
+    const cells = {};
+    for (const source of ['search', 'nonsearch']) {
+        for (const persona of ['driver', 'garage_owner']) {
+            for (const outcome of ['new', 'duplicate']) cells[`${source}|${persona}|${outcome}`] = new Set();
+        }
+    }
+    for (const event of newSignups) {
+        if (!event.session_id) continue;
+        const source = referralClass(event.referrer);
+        const persona = event.persona || 'unknown';
+        if (cells[`${source}|${persona}|new`]) cells[`${source}|${persona}|new`].add(event.session_id);
+    }
+    for (const [key, successCount] of successCounts) {
+        const [sessionId, source, persona] = key.split('\u0000');
+        if (successCount > (newCounts.get(key) || 0) && cells[`${source}|${persona}|duplicate`]) {
+            cells[`${source}|${persona}|duplicate`].add(sessionId);
+        }
+    }
+
+    const searchViewSessions = new Set(views.filter(event => event.session_id && referralClass(event.referrer) === 'search')
+        .map(event => event.session_id));
+    const searchDriverSessions = new Set(newSignups.filter(event => event.session_id && event.persona === 'driver' &&
+        referralClass(event.referrer) === 'search').map(event => event.session_id));
+    const matchedSearchDriverSessions = new Set([...searchDriverSessions].filter(sessionId => searchViewSessions.has(sessionId)));
+    const nullSessionEvents = [...views, ...successes, ...newSignups].filter(event => !event.session_id).length;
+    return {
+        cells: Object.fromEntries(Object.entries(cells).map(([key, sessions]) => [key, sessions.size])),
+        searchViewSessions: searchViewSessions.size,
+        searchDriverConversionSessions: matchedSearchDriverSessions.size,
+        searchDriverConversionsWithoutMatchingView: searchDriverSessions.size - matchedSearchDriverSessions.size,
+        nullSessionEvents
+    };
+}
 
 class Element {
     constructor() {
@@ -34,7 +93,7 @@ class Element {
 async function run({ status = 201, networkError = false, analyticsError = false,
                      storageDenied = false, valid = true, persona = 'driver',
                      referrer = 'https://www.google.ae/search?q=private-email%40example.com',
-                     returning = false, doubleSubmit = false } = {}) {
+                     returning = false, doubleSubmit = false, sessionId = 'test-session' } = {}) {
     const requests = [];
     const secondary = [];
     const form = new Element();
@@ -79,7 +138,7 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         navigator: {},
         sessionStorage: storage,
         localStorage: storage,
-        crypto: { randomUUID: () => 'test-session' },
+        crypto: { randomUUID: () => sessionId },
         URL,
         console: { error() {}, log() {} },
         setTimeout: () => 0,
@@ -168,5 +227,50 @@ async function run({ status = 201, networkError = false, analyticsError = false,
     await check({ returning: true }, 0, true);
     const repeated = await check({ doubleSubmit: true }, 1, true);
     assert.equal(repeated.requests.filter(request => request.url.endsWith('/waitlist')).length, 1);
+
+    assert.equal(referralClass('www.google.ae'), 'search');
+    assert.equal(referralClass('google.evil.example'), 'nonsearch');
+    assert.equal(referralClass(null), 'unknown');
+    const matrixEvents = [];
+    let matrixSessions = 0;
+    for (const source of ['search', 'nonsearch']) {
+        for (const persona of ['driver', 'garage_owner']) {
+            for (const outcome of ['new', 'duplicate']) {
+                const result = await run({
+                    status: outcome === 'new' ? 201 : 409,
+                    persona,
+                    referrer: source === 'search' ? 'https://www.google.ae/search?q=private' : 'https://example.com/article',
+                    sessionId: `matrix-session-${++matrixSessions}`
+                });
+                matrixEvents.push(...result.events);
+            }
+        }
+    }
+    const report = summarizeMeasurement(matrixEvents);
+    for (const source of ['search', 'nonsearch']) {
+        for (const persona of ['driver', 'garage_owner']) {
+            for (const outcome of ['new', 'duplicate']) {
+                assert.equal(report.cells[`${source}|${persona}|${outcome}`], 1,
+                    `${source}/${persona}/${outcome} cross-tab cell`);
+            }
+        }
+    }
+    assert.equal(report.searchViewSessions, 4);
+    assert.equal(report.searchDriverConversionSessions, 1);
+    assert.equal(report.searchDriverConversionsWithoutMatchingView, 0);
+    assert.equal(report.nullSessionEvents, 0);
+    const orphanReport = summarizeMeasurement([
+        { name: 'landing_view', session_id: 'page-session', referrer: 'www.google.ae' },
+        { name: 'waitlist_success', session_id: 'orphan-session', persona: 'driver', referrer: 'www.google.ae' },
+        { name: 'waitlist_new_signup', session_id: 'orphan-session', persona: 'driver', referrer: 'www.google.ae' }
+    ]);
+    assert.equal(orphanReport.searchDriverConversionSessions, 0, 'conversion requires a matching search landing_view session');
+    assert.equal(orphanReport.searchDriverConversionsWithoutMatchingView, 1);
+    const unknownSessionReport = summarizeMeasurement([
+        { name: 'landing_view', session_id: null, referrer: null },
+        { name: 'waitlist_success', session_id: null, persona: 'driver', referrer: null },
+        { name: 'waitlist_new_signup', session_id: null, persona: 'driver', referrer: null }
+    ]);
+    assert.equal(unknownSessionReport.nullSessionEvents, 3, 'null IDs are reported separately, never merged into one visitor');
     console.log(`PASS: ${scenarios} landing measurement scenarios; all fetches intercepted.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });
