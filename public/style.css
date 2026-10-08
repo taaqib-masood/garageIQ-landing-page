@@ -2876,3 +2876,115 @@ select:focus-visible,
     width: 15px; height: 15px;
     fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round;
 }
+
+/* Static methodology article; all content is visible without JavaScript. */
+.methodology-page .methodology-shell {
+    max-width: 820px;
+}
+
+.methodology-page .methodology-header {
+    padding: 2rem 0 3rem;
+}
+
+.methodology-page .headline-heavy {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+}
+
+.methodology-page .methodology-nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+}
+
+.methodology-page .methodology-nav a {
+    padding: 0.75rem 0;
+}
+
+.methodology-page .methodology-kicker,
+.methodology-page .methodology-byline,
+.methodology-page .methodology-small {
+    font-size: 0.9rem;
+}
+
+.methodology-page .methodology-kicker {
+    font-weight: 600;
+    letter-spacing: 0.08em;
+}
+
+.methodology-page main {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.methodology-page h2 {
+    margin: 2.5rem 0 1rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.methodology-page h3 {
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.methodology-page main p + p,
+.methodology-page main li + li {
+    margin-top: 0.75rem;
+}
+
+.methodology-page main ul,
+.methodology-page main ol {
+    padding-left: 1.5rem;
+}
+
+.methodology-page main a:not(.btn-primary) {
+    color: inherit;
+    text-underline-offset: 0.2em;
+}
+
+.methodology-page .methodology-contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    border-block: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin-top: 1.5rem;
+}
+
+.methodology-page .methodology-contents a {
+    padding: 0.4rem 0;
+}
+
+.methodology-page .methodology-note {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.methodology-page .methodology-note h2 {
+    margin-top: 0;
+}
+
+.methodology-page .methodology-cta {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.methodology-page .methodology-cta p {
+    margin: 0;
+}
+
+.methodology-page [id] {
+    scroll-margin-top: 1rem;
+}
+
+.methodology-page .methodology-footer {
+    padding: 1.5rem 0;
+}
