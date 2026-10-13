@@ -63,8 +63,8 @@ body {
     line-height: 1.5;
 }
 
-/* Hide the native cursor only after the custom cursor has initialized. */
-@media (any-hover: hover) and (any-pointer: fine) {
+/* Hide the native cursor only while the initialized custom cursor can be shown. */
+@media (any-hover: hover) and (any-pointer: fine) and (prefers-reduced-motion: no-preference) {
     html.custom-cursor-enabled,
     html.custom-cursor-enabled body,
     html.custom-cursor-enabled body * {
@@ -950,31 +950,30 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 /* Progress Dots */
 .iphone-dots {
     position: absolute;
-    bottom: -28px;
+    bottom: -47px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 8px;
+    gap: 0;
     z-index: 5;
 }
 
 .iphone-dots .dot {
-    width: 6px;
-    height: 6px;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
     border-radius: 50%;
-    background: var(--text-color);
+    background: transparent;
     opacity: 0.2;
-    transition: opacity 0.3s cubic-bezier(0.83, 0, 0.17, 1),
-                transform 0.3s cubic-bezier(0.83, 0, 0.17, 1);
-    /* Dots are <button> now (keyboard-operable). Strip the UA chrome so they
-       render exactly as the original <span> dots did. */
+    transition: opacity 0.3s cubic-bezier(0.83, 0, 0.17, 1);
+    /* Size the buttons themselves so adjacent touch targets never overlap. */
     padding: 0;
     border: none;
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    /* Keeps the 6px visual while giving a usable touch/click target. */
-    box-sizing: content-box;
+    box-sizing: border-box;
 }
 
 .iphone-dots .dot:focus-visible {
@@ -985,29 +984,27 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 
 .bg-black .iphone-dots .dot:focus-visible { outline-color: #FFFFFF; }
 
-/* The dots read as 6px, but a 6px tap target is not operable on a phone
-   (WCAG 2.5.8 wants 24px, Apple HIG wants 44px). This grows the hit area to
-   44px with a transparent pseudo-element while the dot itself stays 6px.
-   position:relative is safe here: the dots are laid out by flex, not offsets. */
-.iphone-dots .dot { position: relative; }
-
+/* Keep the 6px visual; only this decoration scales when selected. */
 .iphone-dots .dot::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 44px;
-    height: 44px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-color);
     transform: translate(-50%, -50%);
+    transition: transform 0.3s cubic-bezier(0.83, 0, 0.17, 1);
+    pointer-events: none;
 }
-
-/* Same problem, smaller scale: give the row enough room for the bigger
-   targets so neighbouring dots do not overlap each other's hit areas. */
-.iphone-dots { gap: 14px; }
 
 .iphone-dots .dot.active {
     opacity: 1;
-    transform: scale(1.4);
+}
+
+.iphone-dots .dot.active::after {
+    transform: translate(-50%, -50%) scale(1.4);
 }
 
 /* Slide Animations */
@@ -2697,6 +2694,8 @@ html.legal-dialog-open body {
     max-width: 32rem;
     text-align: center;
 }
+
+.noscript-notice a { color: inherit; }
 
 /* ── Minimum touch targets ──────────────────────────────────────────────────
    Several controls rendered under 44px tall. Rather than change the type or

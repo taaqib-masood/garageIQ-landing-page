@@ -20,8 +20,8 @@
     <meta property="og:title" content="GarageIQ | UAE Garage Reviews &amp; Discovery — Early Access">
     <meta property="og:description" content="GarageIQ is building garage discovery and review intelligence for UAE drivers. Learn what to check in reviews and join the prelaunch early-access waitlist.">
     <meta property="og:image" content="https://www.garageiq.ae/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="569">
     <meta property="og:image:alt" content="GarageIQ - The trust layer for car repair in the UAE">
 
     <!-- Twitter -->
@@ -43,7 +43,19 @@
          Warming the connection now means the download starts on arrival rather
          than after a DNS + TLS handshake. Costs one connection, no bytes. -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="style.css?v=20260905-legal">
+    <link rel="stylesheet" href="style.css?v=20261012-accessibility">
+    <noscript>
+        <style>
+            .mechanical-reveal span { opacity: 1 !important; transform: none !important; animation: none !important; }
+            .window-wipe-reveal { clip-path: none !important; transform: none !important; }
+            .ordered-progress-large, .hud-panel, .hud-panel-header, .hud-row, .monolith-wordmark span, .monolith-status-text, .footer-links { opacity: 1 !important; transform: none !important; }
+            .faq-answer { grid-template-rows: 1fr; }
+            .faq-answer p { opacity: 1; padding-bottom: 1.5rem; }
+            .faq-question::after { content: none; }
+            .waitlist-form, #hero-search, .hero-readout, .iphone-dots, .chaos-stars,
+            .footer-links [data-open-terms], .footer-links [data-open-terms] + .dot-separator { display: none !important; }
+        </style>
+    </noscript>
 
     <!-- Structured data. The FAQ answers below mirror the visible FAQ section
          verbatim; if you edit one, edit the other or the markup is non-compliant. -->
@@ -619,20 +631,19 @@
                 <h2 class="headline-heavy mechanical-reveal"><span>Stop guessing.</span><br><span>Start knowing.</span></h2>
                 
                 <!--
-                  Without JS the form cannot submit: the insert goes through the
-                  Supabase SDK, and PostgREST will not accept a urlencoded native
-                  form POST. Previously that failed silently — the visitor filled
-                  the field, pressed the button and nothing whatsoever happened.
-                  Say so instead of pretending.
+                  Signup uses JavaScript to send a JSON insert. Without it, hide
+                  the form and show this notice; a native GET would expose the
+                  email in the URL. POST also avoids that fallback if JS fails.
                 -->
                 <noscript>
                     <p class="noscript-notice">
                         Signup needs JavaScript, which is currently turned off.
-                        Enable it for this page and the form below will work.
+                        Enable it for this page to join the waitlist. You can still
+                        <a href="/how-it-works/">read our garage review guide</a>.
                     </p>
                 </noscript>
 
-                <form class="waitlist-form mt-8 w-full mechanical-reveal" novalidate>
+                <form class="waitlist-form mt-8 w-full mechanical-reveal" method="post" novalidate>
                     <fieldset class="waitlist-persona">
                         <legend class="visually-hidden">Who are you?</legend>
                         <label class="persona-option">
