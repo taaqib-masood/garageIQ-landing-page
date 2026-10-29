@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     trackEvent('landing_view');
 
-    // Query typed into the hero search, carried down to the waitlist submit.
+    // Keep hero search text in page memory; only record whether it was used.
     let pendingHeroQuery = '';
 
     // Declared once, up here, because several features below need it and a
@@ -679,9 +679,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             trackEvent('hero_search_submit', query ? { has_query: 'yes' } : { has_query: 'no' });
 
-            // Search itself isn't live yet. Rather than pretend, carry the query
-            // down to the waitlist so it is captured with the signup — that is
-            // the most useful thing we can do with real intent right now.
+            // Search is only a preview. Keep its text in page memory; the
+            // analytics event above records only whether a query was entered.
             if (query) {
                 pendingHeroQuery = query;
                 if (heroSearchNote) {
@@ -1333,10 +1332,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remembering the signup is what makes a return visit make sense. Without
         // it a visitor who already joined comes back to an empty form with no
         // acknowledgement, and either signs up again or assumes it failed.
-        const SIGNED_UP_KEY = 'giq_waitlist_email';
+        const SIGNED_UP_KEY = 'giq_waitlist_joined';
+        const LEGACY_SIGNED_UP_KEY = 'giq_waitlist_email';
 
         const readSignedUp = () => {
-            try { return localStorage.getItem(SIGNED_UP_KEY); } catch (_) { return null; }
+            try {
+                if (localStorage.getItem(LEGACY_SIGNED_UP_KEY) !== null) {
+                    localStorage.removeItem(LEGACY_SIGNED_UP_KEY);
+                    localStorage.setItem(SIGNED_UP_KEY, '1');
+                }
+                return localStorage.getItem(SIGNED_UP_KEY) === '1';
+            } catch (_) { return false; }
         };
 
         /**
@@ -1381,11 +1387,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const sub = document.createElement('p');
             sub.className = 'waitlist-microcopy mt-2';
-            sub.append(document.createTextNode("We'll email "));
-            const strong = document.createElement('strong');
-            strong.className = 'waitlist-success-email';
-            strong.textContent = email;                    // user input — textContent
-            sub.append(strong, document.createTextNode(' when we launch.'));
+            if (email) {
+                sub.append(document.createTextNode("We'll email "));
+                const strong = document.createElement('strong');
+                strong.className = 'waitlist-success-email';
+                strong.textContent = email;
+                sub.append(strong, document.createTextNode(' when we launch.'));
+            } else {
+                sub.textContent = "We'll email you when we launch.";
+            }
 
             const actions = document.createElement('div');
             actions.className = 'waitlist-success-actions';
@@ -1422,7 +1432,10 @@ document.addEventListener('DOMContentLoaded', () => {
             fix.className = 'waitlist-success-action is-quiet';
             fix.textContent = 'Use a different email';
             fix.addEventListener('click', () => {
-                try { localStorage.removeItem(SIGNED_UP_KEY); } catch (_) {}
+                try {
+                    localStorage.removeItem(SIGNED_UP_KEY);
+                    localStorage.removeItem(LEGACY_SIGNED_UP_KEY);
+                } catch (_) {}
                 trackEvent('waitlist_edit_email');
                 window.location.reload();
             });
@@ -1445,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // would be hostile.
         const alreadySignedUp = readSignedUp();
         if (alreadySignedUp) {
-            renderSuccess(alreadySignedUp, { returning: true });
+            renderSuccess(null, { returning: true });
             document.querySelector('.waitlist-success')?.blur();
         }
 
@@ -1485,7 +1498,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = { email };
             if (persona) row.persona = persona;
             if (emirate) row.emirate = emirate;
-            if (pendingHeroQuery) row.first_query = pendingHeroQuery.slice(0, 200);
 
             // Plain fetch against PostgREST rather than the Supabase SDK. The SDK
             // was 54 KB and a measured 1044 ms on Slow 4G to perform this one
@@ -1539,7 +1551,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             trackEvent('waitlist_success', signupEvent);
             if (res.ok) trackEvent('waitlist_new_signup', signupEvent);
-            try { localStorage.setItem(SIGNED_UP_KEY, email); } catch (_) {}
+            try { localStorage.setItem(SIGNED_UP_KEY, '1'); } catch (_) {}
             renderSuccess(email, { returning: res.status === 409 });
         });
     }
