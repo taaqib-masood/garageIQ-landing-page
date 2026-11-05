@@ -6,13 +6,17 @@
 - Unclassified: 6 file(s) not represented in the graph (top: (none) 3, .woff2 1, .xml 1)
 
 ## Summary
-- 77 nodes · 92 edges · 9 communities (4 shown, 5 thin omitted)
-- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.85)
+- 77 nodes · 92 edges · 9 communities (all shown)
+- Extraction: 92.4% EXTRACTED · 7.6% INFERRED · 0.0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
 - Built from commit: `736c2293`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Source-aware freshness check (stale only if this command prints paths; documentation-only and graph-only commits do not count):
+
+```sh
+git diff --name-only 736c2293101377658859cb655bbe36de8e08ddb2 HEAD -- ':(glob)**/*.cjs' ':(glob)**/*.js' ':(glob)**/*.json' ':(glob)**/*.py' ':(exclude)graphify-out/**'
+```
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
@@ -45,23 +49,43 @@
 ## Import Cycles
 - None detected.
 
-## Communities (9 total, 5 thin omitted)
+## Communities (9 total; all shown)
 
 ### Community 0 - "seo_check.py"
 Cohesion: 0.19
-Nodes (5): check_site(), main(), page_url(), reject_json_constant(), schema_types()
+Nodes (17): check_site(), reference(), main(), page_url(), reject_json_constant(), schema_types(), seo_check.py, Check static marketing HTML, crawl endpoints, local assets and JS syntax.… (+9 more)
 
 ### Community 1 - "check-measurement.cjs"
 Cohesion: 0.17
-Nodes (8): assert, fs, path, referralClass(), script, SEARCH_HOSTS, summarizeMeasurement(), vm
+Nodes (13): referralClass(), summarizeMeasurement(), check-measurement.cjs, assert, fs, path, script, SEARCH_HOSTS (+5 more)
+
+### Community 2 - "Element"
+Cohesion: 0.20
+Nodes (10): Element, .addEventListener(), .append(), .blur(), .constructor(), .focus(), .querySelectorAll(), .replaceChildren() (+2 more)
+
+### Community 3 - "test_seo_check.py"
+Cohesion: 0.20
+Nodes (10): SEOCheckTest, .test_current_site_passes(), .test_new_nested_page_must_have_self_canonical_sitemap_and_valid_links(), .test_rejects_broken_content_then_passes_after_repair(), test_seo_check.py, Run with: python3 scripts/test_seo_check.py (stdlib only; no live writes)., pathlib, shutil (+2 more)
 
 ### Community 4 - "initPixelMap"
 Cohesion: 0.24
-Nodes (4): initPixelMap(), monolithEase(), renderMap(), spawnPulse()
+Nodes (10): initPixelMap(), getPathMetrics(), monolithEase(), renderMap(), spawnPulse(), updateMapLayout(), stopTypewriter(), streamWords() (+2 more)
+
+### Community 5 - "Page"
+Cohesion: 0.33
+Nodes (6): Page, .handle_data(), .handle_endtag(), .handle_starttag(), .__init__(), HTMLParser
 
 ### Community 6 - "package.json"
 Cohesion: 0.33
-Nodes (5): description, name, private, scripts, dev
+Nodes (6): package.json, description, name, private, scripts, dev
+
+### Community 7 - "vercel.json"
+Cohesion: 0.67
+Nodes (3): vercel.json, buildCommand, installCommand
+
+### Community 8 - "uae-paths.js"
+Cohesion: 1.00
+Nodes (2): uae-paths.js, UAE_PATHS
 
 ## Knowledge Gaps
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
