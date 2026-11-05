@@ -17,3 +17,10 @@ __pycache__/
 !.env.example
 *.pem
 *.key
+
+# Graphify: track only portable deliverables
+graphify-out/*
+!graphify-out/GRAPH_REPORT.md
+!graphify-out/graph.json
+!graphify-out/graph.html
+!graphify-out/check_graph.mjs
