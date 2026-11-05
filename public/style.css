@@ -1044,53 +1044,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     z-index: 2;
 }
 
-.app-header {
-    font-weight: 800;
-    font-size: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
-    letter-spacing: -0.02em;
-}
-
-.app-card {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem 1rem;
-}
-
-.app-card-title {
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    font-size: 1.125rem;
-}
-
-.ordered-progress { width: 100%; }
-
-.ordered-label {
-    font-weight: 600;
-    font-size: 1.125rem;
-    margin-bottom: 0.5rem;
-}
-
-.ordered-track {
-    width: 100%;
-    height: 8px;
-    background: var(--border-color);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.ordered-fill {
-    height: 100%;
-    width: 0;
-    background: var(--text-color);
-    transition: width 1.5s var(--ease-brutal) 0.8s;
-}
-
-.grid-container.is-visible .ordered-fill { width: 87%; }
-
 /* Chaos to Order Animation */
 .chaos-to-order-container {
     position: relative;
@@ -1157,15 +1110,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     opacity: 1;
     transform: translateY(0);
 }
-
-.ordered-fill-large {
-    height: 100%;
-    width: 0;
-    background: var(--text-color);
-    transition: width 1.5s var(--ease-brutal) 1.2s;
-}
-
-.grid-container.is-visible .ordered-fill-large { width: 87%; }
 
 /* Features List */
 .features-list {
@@ -1253,25 +1197,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     white-space: nowrap;
 }
 
-.intelligence-meter {
-    height: 5px;
-    margin: 0.75rem 0 1rem;
-    background: #E8E8E8;
-    overflow: hidden;
-}
-
-.intelligence-meter span {
-    display: block;
-    width: 0;
-    height: 100%;
-    background: var(--text-color);
-    transition: width 1.2s var(--ease-brutal) 1.1s;
-}
-
-#solution.is-visible .intelligence-meter span {
-    width: 91%;
-}
-
 .intelligence-signals {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1341,7 +1266,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     flex-shrink: 0; text-align: center; line-height: 1.2; white-space: nowrap;
 }
 .hc-body { font-size: 1rem; }
-.hc-stars { color: var(--text-color); letter-spacing: 1px; }
 .hc-reviews { opacity: 0.6; }
 
 .honesty-layout {
@@ -1364,10 +1288,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     padding: 1rem 0;
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
-}
-
-.honesty-card-large .hc-stars {
-    color: currentColor;
 }
 
 .hc-warning {
@@ -1851,53 +1771,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     color: var(--text-color);
 }
 
-/* B2B Pricing Grid */
-.pricing-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-}
-
-@media (min-width: 768px) {
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-.pricing-card {
-    border: 1px solid var(--border-color);
-    padding: 3rem 2rem;
-    background: #FFF;
-    text-align: left;
-    transition: background 0s, color 0s;
-}
-
-.pricing-card:hover {
-    background: var(--text-color);
-    color: #FFF;
-}
-
-.pricing-card h3 {
-    font-weight: 800;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.pricing-card .price {
-    font-weight: 800;
-    font-size: 2rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1rem;
-}
-
-.pricing-card:hover .price {
-    border-color: #333;
-}
-
-.text-sm {
-    font-size: 1rem;
-    font-weight: 400;
-    opacity: 0.6;
-}
-
 /* Embedded legal panel */
 html.legal-dialog-open,
 html.legal-dialog-open body {
@@ -2040,37 +1913,6 @@ html.legal-dialog-open body {
     line-height: 1.65;
 }
 
-.legal-contact-list {
-    margin: 0;
-    border: 1px solid var(--border-color);
-}
-
-.legal-contact-list div {
-    display: grid;
-    grid-template-columns: minmax(180px, 0.8fr) 1.2fr;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.legal-contact-list div:last-child {
-    border-bottom: 0;
-}
-
-.legal-contact-list dt,
-.legal-contact-list dd {
-    margin: 0;
-    padding: 0.75rem;
-}
-
-.legal-contact-list dt {
-    font-weight: 700;
-    border-right: 1px solid var(--border-color);
-}
-
-.legal-contact-list dd {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.82rem;
-}
-
 @media (max-width: 767px) {
     .legal-dialog {
         width: calc(100% - 1rem);
@@ -2089,18 +1931,6 @@ html.legal-dialog-open body {
         line-height: 1.65;
     }
 
-    .legal-contact-list div {
-        grid-template-columns: 1fr;
-    }
-
-    .legal-contact-list dt {
-        padding-bottom: 0.25rem;
-        border-right: 0;
-    }
-
-    .legal-contact-list dd {
-        padding-top: 0;
-    }
 }
 
 /* Comparison Table */
@@ -2157,9 +1987,6 @@ html.legal-dialog-open body {
         border-right: none;
     }
 
-    .check-icon {
-        flex: 0 0 20px;
-    }
 }
 .comp-row:last-child {
     border-bottom: none;
@@ -2185,19 +2012,6 @@ html.legal-dialog-open body {
 .garageiq-col {
     font-weight: 600;
 }
-.check-icon {
-    color: #FFF;
-    background: var(--text-color);
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    margin-right: 0.5rem;
-}
-
 /* Brutalist FAQ Accordion */
 .faq-list {
     border-top: 1px solid var(--border-color);
@@ -2542,32 +2356,6 @@ html.legal-dialog-open body {
     font-size: 0.875rem;
     color: rgba(255, 255, 255, 0.4);
     font-weight: 300;
-}
-
-.app-teasers {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.app-teaser-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.875rem;
-    color: #FFF;
-    opacity: 0.6;
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: -0.02em;
-}
-
-.app-teaser-pill svg {
-    width: 16px;
-    height: 16px;
 }
 
 @media (max-width: 480px) {
