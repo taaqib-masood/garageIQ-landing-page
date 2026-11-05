@@ -12,10 +12,10 @@
 
 ## Graph Freshness
 - Built from commit: `736c2293`
-- Source-aware freshness check (stale only if this command prints paths; documentation-only and graph-only commits do not count):
+- Source-aware freshness check (stale only if this command prints paths, including uncommitted source edits; documentation-only and graph-only commits do not count):
 
 ```sh
-git diff --name-only 736c2293101377658859cb655bbe36de8e08ddb2 HEAD -- ':(glob)**/*.cjs' ':(glob)**/*.js' ':(glob)**/*.json' ':(glob)**/*.py' ':(exclude)graphify-out/**'
+git diff --name-only 736c2293101377658859cb655bbe36de8e08ddb2 -- ':(glob)**/*.cjs' ':(glob)**/*.js' ':(glob)**/*.json' ':(glob)**/*.py' ':(exclude)graphify-out/**'
 ```
 - Run `graphify update .` after code changes (no API cost).
 
@@ -88,7 +88,6 @@ Cohesion: 1.00
 Nodes (2): uae-paths.js, UAE_PATHS
 
 ## Knowledge Gaps
-- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

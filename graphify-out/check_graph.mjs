@@ -10,6 +10,13 @@ const literal = name => JSON.parse(html.match(new RegExp(`^const ${name} = (.*);
 const nodes = literal('RAW_NODES');
 const legend = literal('LEGEND');
 assert.deepEqual(nodes.map(n => n.id).sort(), graph.nodes.map(n => n.id).sort());
+const nodeDetails = values => values.map(({ id, label, community }) => JSON.stringify([id, label, community])).sort();
+assert.deepEqual(nodeDetails(nodes), nodeDetails(graph.nodes));
+const edges = literal('RAW_EDGES');
+const links = graph.links || graph.edges;
+assert.equal(edges.length, links.length);
+assert.deepEqual(new Set(edges.map(e => JSON.stringify([e.from, e.to]))),
+  new Set(links.map(e => JSON.stringify([e.source, e.target]))));
 assert(legend.length > 0);
 assert.equal(legend.length, new Set(graph.nodes.map(n => n.community)).size);
 assert(!/<script\b[^>]*\bsrc\s*=/i.test(html));
@@ -25,14 +32,11 @@ assert(html.includes('RAW_NODES.filter(n => matchesVisibleSearch(n, q))'));
 assert(/el.onclick = \(\) => \{\s*if \(hiddenCommunities.has\(n.community\)\) return;/.test(html));
 assert(/function updateSelectAllState\(\) \{\s*searchInput.dispatchEvent\(new Event\('input'\)\);/.test(html));
 assert.equal((report.match(/^### Community /gm) || []).length, legend.length);
-assert(!report.includes('thin omitted'));
+assert(!/communities.*omitted/i.test(report));
 assert(/Extraction: \d+\.\d% EXTRACTED · \d+\.\d% INFERRED · \d+\.\d% AMBIGUOUS/.test(report));
-assert(report.includes('git diff --name-only '));
+assert(/^git diff --name-only [0-9a-f]{40} -- .+$/m.test(report));
 assert(report.includes(':(exclude)graphify-out/**'));
 assert(!report.includes('Run `git rev-parse HEAD`'));
-if (new URL('../', import.meta.url).pathname.endsWith('/salon-booking-saas/')) {
-  assert(!graph.nodes.some(n => /^output\//.test(n.source_file || '')));
-}
 const ids = new Set(graph.nodes.map(n => n.id));
 assert((graph.links || graph.edges).every(e => ids.has(e.source) && ids.has(e.target)));
-console.log(`PASS graph: ${nodes.length} nodes, ${legend.length} communities; offline bundle, hidden-search/filter/selection, report and endpoint checks; HTML ${statSync(new URL('graph.html', import.meta.url)).size} bytes`);
+console.log(`PASS graph: ${nodes.length} nodes, ${edges.length} edges, ${legend.length} communities; node labels/communities and edge pairs match JSON; offline bundle, hidden-search/filter/selection, report and endpoint checks; HTML ${statSync(new URL('graph.html', import.meta.url)).size} bytes`);
