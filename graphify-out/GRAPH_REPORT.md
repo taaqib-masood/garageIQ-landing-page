@@ -12,10 +12,11 @@
 
 ## Graph Freshness
 - Built from commit: `736c2293`
-- Source-aware freshness check (stale only if this command prints paths, including uncommitted source edits; documentation-only and graph-only commits do not count):
+- Source-aware freshness check (stale if either command prints paths, including uncommitted edits and untracked new source files; documentation-only and graph-only commits do not count):
 
 ```sh
 git diff --name-only 736c2293101377658859cb655bbe36de8e08ddb2 -- ':(glob)**/*.cjs' ':(glob)**/*.js' ':(glob)**/*.json' ':(glob)**/*.py' ':(exclude)graphify-out/**'
+git ls-files --others --exclude-standard -- ':(glob)**/*.cjs' ':(glob)**/*.js' ':(glob)**/*.json' ':(glob)**/*.py' ':(exclude)graphify-out/**'
 ```
 - Run `graphify update .` after code changes (no API cost).
 

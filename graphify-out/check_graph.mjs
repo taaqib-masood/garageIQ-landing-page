@@ -34,7 +34,9 @@ assert(/function updateSelectAllState\(\) \{\s*searchInput.dispatchEvent\(new Ev
 assert.equal((report.match(/^### Community /gm) || []).length, legend.length);
 assert(!/communities.*omitted/i.test(report));
 assert(/Extraction: \d+\.\d% EXTRACTED · \d+\.\d% INFERRED · \d+\.\d% AMBIGUOUS/.test(report));
-assert(/^git diff --name-only [0-9a-f]{40} -- .+$/m.test(report));
+const freshnessPaths = report.match(/^git diff --name-only [0-9a-f]{40} -- (.+)$/m)?.[1];
+assert(freshnessPaths);
+assert(report.includes(`\ngit ls-files --others --exclude-standard -- ${freshnessPaths}\n`));
 assert(report.includes(':(exclude)graphify-out/**'));
 assert(!report.includes('Run `git rev-parse HEAD`'));
 const ids = new Set(graph.nodes.map(n => n.id));
