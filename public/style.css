@@ -77,6 +77,16 @@ body {
     html.custom-cursor-enabled [contenteditable="true"] {
         cursor: auto !important;
     }
+
+    /* showModal() puts the dialog in the top layer, above the ring at any z-index,
+       so hand the pointer back to the native cursor while it is open. */
+    html.custom-cursor-enabled.legal-dialog-open,
+    html.custom-cursor-enabled.legal-dialog-open body,
+    html.custom-cursor-enabled.legal-dialog-open body * {
+        cursor: auto !important;
+    }
+
+    html.legal-dialog-open #brutalist-cursor { visibility: hidden; }
 }
 
 /* The "Ink Ring" Cursor */
