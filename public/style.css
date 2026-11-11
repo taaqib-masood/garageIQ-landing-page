@@ -2250,6 +2250,9 @@ html.legal-dialog-open body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .waitlist-form.is-success {
@@ -2311,6 +2314,7 @@ html.legal-dialog-open body {
     border-radius: 0;
     padding: 1rem 2rem;
     margin-left: -1px; /* Overlap border */
+    white-space: nowrap;
     position: relative;
     z-index: 2;
 }
