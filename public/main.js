@@ -1323,6 +1323,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const readSignedUp = () => {
             try {
+                // The emirate field is gone; drop the value earlier visits stored.
+                localStorage.removeItem('giq_emirate');
                 if (localStorage.getItem(LEGACY_SIGNED_UP_KEY) !== null) {
                     localStorage.removeItem(LEGACY_SIGNED_UP_KEY);
                     localStorage.setItem(SIGNED_UP_KEY, '1');
