@@ -1073,6 +1073,7 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     width: 24px;
     height: 24px;
     transition: all 0.8s var(--ease-brutal) 0.2s;
+    transition-property: top, left, transform;
 }
 
 /* Chaotic initial state (15 stars) */
@@ -1104,6 +1105,7 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     opacity: 0;
     transform: translateY(20px);
     transition: all 1s var(--ease-brutal) 0.8s;
+    transition-property: opacity, transform;
 }
 
 .grid-container.is-visible .ordered-progress-large {
