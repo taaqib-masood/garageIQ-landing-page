@@ -1482,7 +1482,7 @@ document.addEventListener('DOMContentLoaded', () => {
             trackEvent('waitlist_submit', { persona: persona || 'unknown' });
 
             const restore = () => {
-                btn.textContent = 'Get Early Access';
+                btn.textContent = 'Get early access';
                 btn.disabled = false;
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
