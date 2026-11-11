@@ -700,20 +700,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     outline-offset: 3px;
 }
 
-.waitlist-select {
-    font-family: inherit;
-    font-size: 0.95rem;
-    padding: 0 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 100px;
-    background: transparent;
-    color: #FFFFFF;
-    cursor: pointer;
-    min-height: 52px;
-}
-
-.waitlist-select option { color: #0A0A0A; }
-
 .waitlist-error {
     margin-top: 0.85rem;
     font-size: 0.85rem;
@@ -2337,7 +2323,6 @@ html.legal-dialog-open body {
     }
 
     .waitlist-input,
-    .waitlist-select,
     .waitlist-btn {
         width: 100%;
         min-width: 0;

@@ -1288,7 +1288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (waitlistForm) {
         const emailInput = waitlistForm.querySelector('input[type="email"]');
-        const emirateSelect = waitlistForm.querySelector('select[name="emirate"]');
         const btn = waitlistForm.querySelector('button[type="submit"]');
         const errorEl = waitlistForm.querySelector('.waitlist-error');
 
@@ -1309,19 +1308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         emailInput?.addEventListener('focus', () => trackEvent('waitlist_focus'), { once: true });
 
 
-        // Remember the emirate across visits. Small thing, but this is the one
-        // field a returning visitor would otherwise re-pick every time.
-        try {
-            const saved = localStorage.getItem('giq_emirate');
-            if (saved && emirateSelect && [...emirateSelect.options].some(o => o.value === saved)) {
-                emirateSelect.value = saved;
-            }
-            emirateSelect?.addEventListener('change', () => {
-                try { localStorage.setItem('giq_emirate', emirateSelect.value); } catch (_) {}
-            });
-        } catch (_) {
-            /* private mode: not worth a fallback */
-        }
 
         const showError = (message) => {
             if (!errorEl) return;
@@ -1468,7 +1454,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const email = (emailInput?.value || '').trim();
             const persona = waitlistForm.querySelector('input[name="persona"]:checked')?.value || null;
-            const emirate = emirateSelect?.value || null;
 
             if (errorEl) errorEl.hidden = true;
 
@@ -1497,7 +1482,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // handler at all and the form did a native GET, putting the address
             const row = { email };
             if (persona) row.persona = persona;
-            if (emirate) row.emirate = emirate;
 
             // Plain fetch against PostgREST rather than the Supabase SDK. The SDK
             // was 54 KB and a measured 1044 ms on Slow 4G to perform this one
@@ -1546,7 +1530,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const signupEvent = {
                 persona: persona || 'unknown',
-                emirate: emirate || 'unspecified',
                 from_hero_search: pendingHeroQuery ? 'yes' : 'no'
             };
             trackEvent('waitlist_success', signupEvent);
