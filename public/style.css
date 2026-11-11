@@ -761,9 +761,9 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .pulse-dot {
     width: 8px;
     height: 8px;
-    background-color: var(--text-color);
+    /* Static: nothing is live yet. currentColor keeps it visible on the black hero. */
+    background-color: currentColor;
     border-radius: 50%;
-    animation: pulse 2s infinite;
     margin-right: 8px;
 }
 
