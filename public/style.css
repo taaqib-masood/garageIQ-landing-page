@@ -52,7 +52,7 @@ html {
 
 @media (min-width: 768px) {
     html {
-        zoom: 1.25;
+        zoom: 1.1;
     }
 }
 
@@ -1790,7 +1790,7 @@ html.legal-dialog-open body {
 @media (min-width: 768px) {
     .legal-dialog {
         /* Counter the page-level desktop zoom so the modal stays inside the viewport. */
-        zoom: 0.8;
+        zoom: 0.909; /* 1 / 1.1 */
     }
 }
 
