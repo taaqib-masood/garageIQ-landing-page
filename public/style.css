@@ -496,10 +496,10 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .bg-black .mockup-search:focus-within { border-color: #FFFFFF; }
 
 .search-btn {
-    transition: transform 0.2s var(--ease-brutal), background-color 0.2s var(--ease-brutal);
+    transition: transform 0.2s var(--ease-brutal), opacity 0.2s var(--ease-brutal);
 }
 
-.search-btn:hover { transform: scale(1.06); }
+.search-btn:hover { opacity: 0.85; }
 .search-btn:active { transform: scale(0.96); }
 
 /* ── Hero readout ───────────────────────────────────────────────────────────
