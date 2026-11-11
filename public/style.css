@@ -86,7 +86,7 @@ body {
         cursor: auto !important;
     }
 
-    html.legal-dialog-open #brutalist-cursor { visibility: hidden; }
+    html.custom-cursor-enabled.legal-dialog-open #brutalist-cursor.is-visible { visibility: hidden; }
 }
 
 /* The "Ink Ring" Cursor */
