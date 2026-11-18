@@ -443,7 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Deep link: /#faq-how-does-garageiq-calculate-trust-scores opens that answer.
     const openFaqFromHash = () => {
-        const hash = decodeURIComponent(location.hash.slice(1));
+        let hash;
+        try { hash = decodeURIComponent(location.hash.slice(1)); } catch { return; } // malformed fragment like /#% must not abort setup
         if (!hash.startsWith('faq-')) return;
         const target = faqItems.find(i => i.id === hash);
         if (!target) return;
