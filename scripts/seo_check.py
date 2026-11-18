@@ -8,6 +8,7 @@ import argparse
 from collections import Counter
 from html.parser import HTMLParser
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -97,7 +98,31 @@ def reject_json_constant(value):
     raise ValueError(f"nonstandard JSON constant {value}")
 
 
+def unsafe_entries(public):
+    """Symlinks or entries resolving outside public/; nothing may be read until this is empty."""
+    if public.is_symlink():
+        return ["public/: must be a real directory, not a symlink"]
+    public = public.resolve()
+    found = []
+    for directory, subdirectories, files in os.walk(public, followlinks=False):
+        for name in subdirectories + files:
+            path = Path(directory) / name
+            if path.is_symlink() or not path.resolve().is_relative_to(public):
+                found.append(f"{path.relative_to(public).as_posix()}: symlinks are not allowed in public/")
+    return sorted(found)
+
+
+def node_error_summary(stderr):
+    # Node echoes the offending source line and tokens; keep only the error type and line number.
+    kind = re.search(r"^(\w*Error)\b", stderr, re.M)
+    line = re.match(r".*:(\d+)\s*$", stderr.strip().splitlines()[0]) if stderr.strip() else None
+    return f"{kind.group(1) if kind else 'error'}" + (f" at line {line.group(1)}" if line else "")
+
+
 def check_site(root):
+    unsafe = unsafe_entries(Path(root).resolve() / "public")
+    if unsafe:
+        return unsafe
     public = (Path(root).resolve() / "public").resolve()
     errors = []
     pages = {path.resolve(): Page(path.read_text(encoding="utf-8"))
@@ -212,7 +237,7 @@ def check_site(root):
         try:
             result = subprocess.run(["node", "--check", str(path)], capture_output=True, text=True, timeout=30)
             if result.returncode:
-                errors.append(f"{filename}: JavaScript syntax error: {result.stderr.strip()}")
+                errors.append(f"{filename}: JavaScript syntax error: {node_error_summary(result.stderr)}")
         except (OSError, subprocess.TimeoutExpired) as error:
             errors.append(f"{filename}: JavaScript syntax check unavailable: {error}")
     return errors
