@@ -41,10 +41,6 @@
          which would otherwise delay it by a full round trip. -->
     <link rel="preload" href="/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 
-    <!-- three.js is fetched lazily from here when the map section is approached.
-         Warming the connection now means the download starts on arrival rather
-         than after a DNS + TLS handshake. Costs one connection, no bytes. -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="style.css?v=20261111-polish">
     <noscript>
         <style>
@@ -770,9 +766,8 @@
                 and the page still works without them.</p>
 
                 <h3>Other services this page uses</h3>
-                <p>The site is hosted by Vercel. The 3D map further down the page loads a
-                graphics library from cdnjs, and only if you scroll far enough to reach it.
-                Both may see your IP address as a normal part of serving a request.</p>
+                <p>The site is hosted by Vercel, which may see your IP address as a normal
+                part of serving a request.</p>
 
                 <h3>Removing yourself</h3>
                 <p>Email <a href="mailto:privacy@garageiq.ae">privacy@garageiq.ae</a> and we
@@ -828,6 +823,9 @@
       first-party in public.landing_events (see trackEvent in main.js) and this
       stays as a harmless secondary sink. To also turn Vercel's on:
           vercel project web-analytics garage-iq-landing-page-api
+
+      The Content-Security-Policy in build/output-config.json allows this one
+      inline script by its sha256 hash. Change a byte of it and update the hash.
     -->
     <script>
       window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
