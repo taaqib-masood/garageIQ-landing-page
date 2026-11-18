@@ -52,7 +52,7 @@ html {
 
 @media (min-width: 768px) {
     html {
-        zoom: 1.25;
+        zoom: 1.1;
     }
 }
 
@@ -77,6 +77,16 @@ body {
     html.custom-cursor-enabled [contenteditable="true"] {
         cursor: auto !important;
     }
+
+    /* showModal() puts the dialog in the top layer, above the ring at any z-index,
+       so hand the pointer back to the native cursor while it is open. */
+    html.custom-cursor-enabled.legal-dialog-open,
+    html.custom-cursor-enabled.legal-dialog-open body,
+    html.custom-cursor-enabled.legal-dialog-open body * {
+        cursor: auto !important;
+    }
+
+    html.custom-cursor-enabled.legal-dialog-open #brutalist-cursor.is-visible { visibility: hidden; }
 }
 
 /* The "Ink Ring" Cursor */
@@ -496,10 +506,10 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .bg-black .mockup-search:focus-within { border-color: #FFFFFF; }
 
 .search-btn {
-    transition: transform 0.2s var(--ease-brutal), background-color 0.2s var(--ease-brutal);
+    transition: transform 0.2s var(--ease-brutal), opacity 0.2s var(--ease-brutal);
 }
 
-.search-btn:hover { transform: scale(1.06); }
+.search-btn:hover { opacity: 0.85; }
 .search-btn:active { transform: scale(0.96); }
 
 /* ── Hero readout ───────────────────────────────────────────────────────────
@@ -700,20 +710,6 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     outline-offset: 3px;
 }
 
-.waitlist-select {
-    font-family: inherit;
-    font-size: 0.95rem;
-    padding: 0 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 100px;
-    background: transparent;
-    color: #FFFFFF;
-    cursor: pointer;
-    min-height: 52px;
-}
-
-.waitlist-select option { color: #0A0A0A; }
-
 .waitlist-error {
     margin-top: 0.85rem;
     font-size: 0.85rem;
@@ -761,16 +757,10 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
 .pulse-dot {
     width: 8px;
     height: 8px;
-    background-color: var(--text-color);
+    /* Static: nothing is live yet. currentColor keeps it visible on the black hero. */
+    background-color: currentColor;
     border-radius: 50%;
-    animation: pulse 2s infinite;
     margin-right: 8px;
-}
-
-@keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(10, 10, 10, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(10, 10, 10, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(10, 10, 10, 0); }
 }
 
 .cli-cursor {
@@ -1073,6 +1063,7 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     width: 24px;
     height: 24px;
     transition: all 0.8s var(--ease-brutal) 0.2s;
+    transition-property: top, left, transform;
 }
 
 /* Chaotic initial state (15 stars) */
@@ -1104,6 +1095,7 @@ html.custom-cursor-enabled #brutalist-cursor.is-visible {
     opacity: 0;
     transform: translateY(20px);
     transition: all 1s var(--ease-brutal) 0.8s;
+    transition-property: opacity, transform;
 }
 
 .grid-container.is-visible .ordered-progress-large {
@@ -1794,7 +1786,7 @@ html.legal-dialog-open body {
 @media (min-width: 768px) {
     .legal-dialog {
         /* Counter the page-level desktop zoom so the modal stays inside the viewport. */
-        zoom: 0.8;
+        zoom: 0.909; /* 1 / 1.1 */
     }
 }
 
@@ -2268,6 +2260,9 @@ html.legal-dialog-open body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .waitlist-form.is-success {
@@ -2329,6 +2324,7 @@ html.legal-dialog-open body {
     border-radius: 0;
     padding: 1rem 2rem;
     margin-left: -1px; /* Overlap border */
+    white-space: nowrap;
     position: relative;
     z-index: 2;
 }
@@ -2341,7 +2337,6 @@ html.legal-dialog-open body {
     }
 
     .waitlist-input,
-    .waitlist-select,
     .waitlist-btn {
         width: 100%;
         min-width: 0;
