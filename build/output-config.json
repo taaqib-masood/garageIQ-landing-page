@@ -7,7 +7,8 @@
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "strict-origin-when-cross-origin",
         "X-Frame-Options": "SAMEORIGIN",
-        "Permissions-Policy": "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+        "Permissions-Policy": "geolocation=(), microphone=(), camera=(), interest-cohort=()",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-6+AmyFiEFMAU4fbYkttRRlWQ23FuyaT1Cx9YOz4CSCw='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://zbqtaiozkhfscwynddjd.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
       },
       "continue": true
     },

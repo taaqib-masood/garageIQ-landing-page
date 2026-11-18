@@ -1264,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!entries.some((e) => e.isIntersecting)) return;
             mapLoader.disconnect();
             Promise.all([
-                loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'),
+                loadScriptOnce('three.min.js'),
                 loadScriptOnce('uae-paths.js'),
             ])
                 .then(initPixelMap)
