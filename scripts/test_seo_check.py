@@ -85,6 +85,34 @@ class SEOCheckTest(unittest.TestCase):
                                                     'href="/#missing-anchor"'))
             self.assertTrue(any("fragment" in error for error in check_site(root)))
 
+    def test_rejects_symlinks_without_reading_their_targets(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / "public", root / "public")
+            secret = root / "secret.txt"
+            secret.write_text("TOKEN-VALUE-not-javascript")
+            script = root / "public/uae-paths.js"
+            script.unlink()
+            script.symlink_to(secret)
+            (root / "public/leak.html").symlink_to(secret)
+            (root / "public/linked-dir").symlink_to(root)
+            errors = check_site(root)
+            for name in ("uae-paths.js", "leak.html", "linked-dir"):
+                self.assertIn(f"{name}: symlinks are not allowed in public/", errors)
+            self.assertFalse(any("TOKEN-VALUE" in error for error in errors))
+            secret.chmod(0)  # an attempted read of the target would now raise
+            self.assertEqual(check_site(root), errors)
+
+    def test_node_error_omits_source_line(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / "public", root / "public")
+            script = root / "public/main.js"
+            script.write_text(script.read_text() + "\nconst = SECRET_TOKEN_abc;\n")
+            errors = [error for error in check_site(root) if "main.js" in error]
+            self.assertEqual(len(errors), 1)
+            self.assertRegex(errors[0], r"^main\.js: JavaScript syntax error: SyntaxError at line \d+$")
+
 
 if __name__ == "__main__":
     unittest.main()
