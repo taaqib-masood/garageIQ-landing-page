@@ -2,24 +2,34 @@
 
 This change prepares client-side measurement. It does not establish database
 receipt, authenticated reporting access, indexing, traffic or a live deployment.
-The existing first-party endpoint is reused without a backend/schema change.
+Since 18 November 2026 both first-party writes go through two Supabase RPCs
+defined in `supabase/migrations/20261118000000_waitlist_rpc.sql`
+(`join_waitlist`, `log_event`); anon has no direct INSERT on either table.
+That SQL must be applied by the owner to project `zbqtaiozkhfscwynddjd` before
+the matching `public/main.js` is deployed, or every signup fails.
 
 | Event | Trigger | Counting rule |
 | --- | --- | --- |
 | `landing_view` | Once when this page's `DOMContentLoaded` handler runs | Page-load denominator, including returning visitors |
 | `waitlist_submit` | Locally valid email before the insert request | Intent, not a conversion |
-| `waitlist_success` | A successful insert response or HTTP 409 | Friendly completion, including duplicates; never use as new-lead count |
-| `waitlist_new_signup` | Successful 2xx response to the existing plain insert, excluding HTTP 409 | Filter `persona = driver` for the primary goal; owners and unknown personas remain separate |
-| `waitlist_error` | Failed insert or network request | Failure, never a conversion |
+| `waitlist_success` | A 2xx `join_waitlist` response | Friendly completion, including duplicates; never use as new-lead count |
+| `waitlist_new_signup` | Written by `join_waitlist` itself, only when its insert added a row | Filter `persona = driver` for the primary goal; owners and unknown personas remain separate |
+| `waitlist_error` | Failed request, including 429 rate limit | Failure, never a conversion |
 
-The insert does not request upsert or conflict-ignore behavior. A 409 keeps the
-success interface and says the visitor is already on the list. Invalid email,
+`join_waitlist` runs `insert ... on conflict (email) do nothing` and answers 204
+for new and already-listed emails alike, so the page shows the same "You're on
+the list!" either way and a caller cannot test whether an address is listed.
+The client never sends `waitlist_new_signup`; `log_event` rejects that name, so
+the primary metric counts only real new rows. Both RPCs validate persona and
+lengths (400 otherwise) and rate-limit per client IP: 5 signups per 10 minutes
+(429) and 60 events per minute (excess silently dropped). Invalid email,
 API error and network error emit no new-signup event. The submit button is
 disabled while the insert is pending, including for keyboard submissions.
 Restoring a previously saved success state emits no new-signup event.
 
-Every first-party event preserves the existing payload keys: `name`,
-`session_id`, `persona`, `emirate`, `referrer`. No new database column is assumed.
+Every first-party event sends `name`, `session_id`, `persona` and `referrer`
+(as `p_`-prefixed RPC arguments). `emirate` is no longer collected; the column
+stays for historical rows. No new database column is assumed.
 Email and typed garage-search queries go only to the existing waitlist request,
 never to analytics. The referrer value is an observed hostname, with URL path,
 query and fragment removed. It stays the same for all events on that page load
@@ -66,7 +76,7 @@ leads. Record the actual verified release time as the start of the new series.
 
 Run `node docs/seo/check-measurement.cjs`. It executes the complete script in a
 Node VM, with all requests intercepted and no production entries. Its scenarios
-cover 200/201, duplicate 409, invalid email, API/network failure, failed analytics,
+cover new and already-listed emails (identical UI), 429 rate limit, invalid email, API/network failure, failed analytics,
 denied storage, search/other/missing/malformed referrers, driver/owner/unknown
 personas, returning visitors and repeated submissions during one request. It
 also checks exact search-host classification and all eight search/non-search ×

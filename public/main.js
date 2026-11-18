@@ -50,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // page if the visitor navigates away mid-request; never awaited, so it
         // cannot slow down a form submission.
         try {
+            // log_event validates and rate-limits server-side; anon has no table INSERT.
             const body = JSON.stringify({
-                name,
-                session_id: sessionId,
-                persona: payload.persona || null,
-                emirate: payload.emirate || null,
-                referrer: referrerHost
+                p_name: name,
+                p_session_id: sessionId,
+                p_persona: payload.persona || null,
+                p_referrer: referrerHost
             });
-            fetch(`${SUPABASE_URL}/rest/v1/landing_events`, {
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/log_event`, {
                 method: 'POST',
                 keepalive: true,
                 headers: {
@@ -1371,6 +1371,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const h = document.createElement('h3');
             h.className = 'mt-2';
             h.style.fontSize = '1.5rem';
+            // Only the saved local state says "already"; a submit never does, so the
+            // form cannot be used to test whether someone else's email is listed.
             h.textContent = returning ? "You're already on the list." : "You're on the list!";
 
             const sub = document.createElement('p');
@@ -1482,8 +1484,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // If the Supabase CDN script was blocked, the old code attached no
             // handler at all and the form did a native GET, putting the address
-            const row = { email };
-            if (persona) row.persona = persona;
+            // join_waitlist answers 204 for new and existing emails alike and
+            // records waitlist_new_signup itself, only for a genuinely new row.
+            const row = { p_email: email, p_persona: persona, p_session_id: sessionId, p_referrer: referrerHost };
 
             // Plain fetch against PostgREST rather than the Supabase SDK. The SDK
             // was 54 KB and a measured 1044 ms on Slow 4G to perform this one
@@ -1491,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // above already talks to /rest/v1 this way; this is the same shape.
             let res;
             try {
-                res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+                res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/join_waitlist`, {
                     method: 'POST',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1512,10 +1515,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 409 is PostgREST's unique violation (Postgres 23505) — already signed
-            // up, which is a success from the visitor's point of view. Anything
-            // else that is not 2xx is a real failure and must be surfaced.
-            if (!res.ok && res.status !== 409) {
+            if (!res.ok) {
                 restore();
                 let code = String(res.status);
                 try {
@@ -1525,7 +1525,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (_) {
                     console.error('[waitlist] insert failed:', res.status);
                 }
-                showError("That didn't go through. Please try again.");
+                showError(res.status === 429
+                    ? 'Too many attempts from this connection. Please try again in a few minutes.'
+                    : "That didn't go through. Please try again.");
                 trackEvent('waitlist_error', { code });
                 return;
             }
@@ -1535,9 +1537,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 from_hero_search: pendingHeroQuery ? 'yes' : 'no'
             };
             trackEvent('waitlist_success', signupEvent);
-            if (res.ok) trackEvent('waitlist_new_signup', signupEvent);
             try { localStorage.setItem(SIGNED_UP_KEY, '1'); } catch (_) {}
-            renderSuccess(email, { returning: res.status === 409 });
+            renderSuccess(email);
         });
     }
 

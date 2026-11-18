@@ -1,5 +1,8 @@
 // Runs the complete landing script with browser surfaces stubbed and every
 // request intercepted. No production API calls or real waitlist entries.
+// The fetch stub plays the two RPCs in supabase/migrations: join_waitlist
+// answers 204 for new and listed emails alike and writes waitlist_new_signup
+// itself, only for a new email.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -90,11 +93,12 @@ class Element {
     querySelectorAll() { return []; }
 }
 
-async function run({ status = 201, networkError = false, analyticsError = false,
+async function run({ status = 204, listed = false, networkError = false, analyticsError = false,
                      storageDenied = false, valid = true, persona = 'driver',
                      referrer = 'https://www.google.ae/search?q=private-email%40example.com',
                      returning = false, doubleSubmit = false, sessionId = 'test-session' } = {}) {
     const requests = [];
+    const events = [];
     const secondary = [];
     const form = new Element();
     const email = new Element();
@@ -152,15 +156,23 @@ async function run({ status = 201, networkError = false, analyticsError = false,
             va: (type, payload) => secondary.push({ type, payload })
         },
         async fetch(url, options) {
-            requests.push({ url, body: JSON.parse(options.body) });
-            if (url.endsWith('/landing_events')) {
+            const body = JSON.parse(options.body);
+            requests.push({ url, body });
+            if (url.endsWith('/rpc/log_event')) {
+                events.push({ name: body.p_name, session_id: body.p_session_id,
+                              persona: body.p_persona, referrer: body.p_referrer });
                 if (analyticsError) throw Error('analytics unavailable');
-                return { ok: true, status: 201 };
+                return { ok: true, status: 204 };
             }
-            assert.ok(url.endsWith('/waitlist'), 'all fetches must be intercepted known requests');
+            assert.ok(url.endsWith('/rpc/join_waitlist'), 'all fetches must be intercepted known requests');
             if (insertPending) await insertPending;
             if (networkError) throw Error('signup unavailable');
-            return { ok: status >= 200 && status < 300, status, json: async () => ({ code: 'test_error' }) };
+            const ok = status >= 200 && status < 300;
+            if (ok && !listed) {
+                events.push({ name: 'waitlist_new_signup', session_id: body.p_session_id,
+                              persona: body.p_persona || 'unknown', referrer: body.p_referrer });
+            }
+            return { ok, status, json: async () => ({ code: 'test_error' }) };
         }
     };
     vm.runInNewContext(script, context, { filename: 'public/main.js', timeout: 1000 });
@@ -174,9 +186,11 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         await first;
         if (second) await second;
     }
-    const events = requests.filter(request => request.url.endsWith('/landing_events')).map(request => request.body);
+    for (const request of requests.filter(request => request.url.endsWith('/rpc/log_event'))) {
+        assert.deepEqual(Object.keys(request.body).sort(), ['p_name', 'p_persona', 'p_referrer', 'p_session_id']);
+        assert.notEqual(request.body.p_name, 'waitlist_new_signup', 'only the server records new signups');
+    }
     for (const event of events) {
-        assert.deepEqual(Object.keys(event).sort(), ['emirate', 'name', 'persona', 'referrer', 'session_id']);
         assert.ok(!JSON.stringify(event).includes('@'), 'analytics cannot contain an email or referrer query');
         assert.equal(event.referrer, referrer ? (() => { try { return new URL(referrer).hostname; } catch { return null; } })() : null);
     }
@@ -194,7 +208,6 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         if (expectedNew) {
             const expectedPersona = Object.hasOwn(options, 'persona') ? options.persona || 'unknown' : 'driver';
             assert.equal(newSignups[0].persona, expectedPersona);
-            assert.equal(newSignups[0].emirate, 'dubai');
             assert.equal(newSignups[0].session_id, options.storageDenied ? null : 'test-session');
         }
         assert.equal(result.form.classList.contains('is-success'), success);
@@ -202,13 +215,15 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         return result;
     };
     await check({ status: 200 }, 1, true);
-    await check({ status: 201 }, 1, true);
-    const duplicate = await check({ status: 409 }, 0, true);
+    const fresh = await check({ status: 204 }, 1, true);
+    const duplicate = await check({ listed: true }, 0, true);
     assert.equal(duplicate.events.filter(event => event.name === 'waitlist_success').length, 1);
     const text = element => [element.textContent, ...(element.children || []).map(text)].join(' ');
-    assert.ok(text(duplicate.form).includes("You're already on the list."));
+    assert.equal(text(duplicate.form), text(fresh.form), 'a listed email must look exactly like a new one');
+    const limited = await check({ status: 429 }, 0, false);
+    assert.match(limited.error.textContent, /Too many attempts/);
     const invalid = await check({ valid: false }, 0, false);
-    assert.equal(invalid.requests.filter(request => request.url.endsWith('/waitlist')).length, 0);
+    assert.equal(invalid.requests.filter(request => request.url.endsWith('/rpc/join_waitlist')).length, 0);
     assert.equal(invalid.email.focused, true);
     const failure = await check({ status: 500 }, 0, false);
     assert.equal(failure.error.hidden, false);
@@ -226,7 +241,7 @@ async function run({ status = 201, networkError = false, analyticsError = false,
     assert.equal(unknown.events.find(event => event.name === 'waitlist_new_signup').persona, 'unknown');
     await check({ returning: true }, 0, true);
     const repeated = await check({ doubleSubmit: true }, 1, true);
-    assert.equal(repeated.requests.filter(request => request.url.endsWith('/waitlist')).length, 1);
+    assert.equal(repeated.requests.filter(request => request.url.endsWith('/rpc/join_waitlist')).length, 1);
 
     assert.equal(referralClass('www.google.ae'), 'search');
     assert.equal(referralClass('google.evil.example'), 'nonsearch');
@@ -237,7 +252,7 @@ async function run({ status = 201, networkError = false, analyticsError = false,
         for (const persona of ['driver', 'garage_owner']) {
             for (const outcome of ['new', 'duplicate']) {
                 const result = await run({
-                    status: outcome === 'new' ? 201 : 409,
+                    listed: outcome === 'duplicate',
                     persona,
                     referrer: source === 'search' ? 'https://www.google.ae/search?q=private' : 'https://example.com/article',
                     sessionId: `matrix-session-${++matrixSessions}`
